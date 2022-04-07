@@ -5,6 +5,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
+//Modules
+import { HomeModule } from './home/home.module';
+
 @NgModule({
   declarations: [
     AppComponent
@@ -12,7 +15,8 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    NoopAnimationsModule
+    NoopAnimationsModule,
+    HomeModule
   ],
   providers: [],
   bootstrap: [AppComponent]
