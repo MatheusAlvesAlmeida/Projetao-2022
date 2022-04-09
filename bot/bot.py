@@ -74,7 +74,8 @@ class TelegramBot:
         gender = user["gender"]
         phone_number = user["phone_number"]
 
-        self.responder((speeches.users_speech['hello'], name), last_chat_id)
+        greetings_text = speeches.users_speech['hello'] % (name)
+        self.responder(greetings_text, last_chat_id)
         next_message, update_id = self.get_next_message(update_id)
         option = next_message["message"]["text"]
         
