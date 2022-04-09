@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AcsDataComponent } from './acs-data.component';
+import { HomeOptionsComponent } from './home-options.component';
 
-describe('AcsDataComponent', () => {
-  let component: AcsDataComponent;
-  let fixture: ComponentFixture<AcsDataComponent>;
+describe('HomeOptionsComponent', () => {
+  let component: HomeOptionsComponent;
+  let fixture: ComponentFixture<HomeOptionsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AcsDataComponent ]
+      declarations: [ HomeOptionsComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AcsDataComponent);
+    fixture = TestBed.createComponent(HomeOptionsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

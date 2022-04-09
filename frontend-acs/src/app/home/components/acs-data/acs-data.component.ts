@@ -12,4 +12,8 @@ export class AcsDataComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  acsName = 'Xuribas'
+  acsData = `Aqui ficam informações gerais: horário e dias de atendimento, etc etc etc`;
+  acsCode = '123456789'
+
 }
