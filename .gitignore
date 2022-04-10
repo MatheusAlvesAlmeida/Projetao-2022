@@ -1,1 +1,5 @@
 .env
+
+frontend-acs/.angular
+frontend-acs/.vscode
+frontend-acs/node_modules
