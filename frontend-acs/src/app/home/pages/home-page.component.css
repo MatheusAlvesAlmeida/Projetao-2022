@@ -1,0 +1,11 @@
+
+mat-tab-group{
+    background-image:linear-gradient(lightgray,lightgray);
+
+}
+mat-tab{
+    color:black;
+}
+mat-icon{
+    color: black;
+}

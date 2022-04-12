@@ -1,4 +1,21 @@
 .example-card {
-    max-width: 400px;
-    margin-bottom: 8px;
-} 
+    margin: auto;
+    width: 70%;
+    text-align:center;
+    min-width: 500px;
+}
+img{
+    border-radius: 50%;
+    margin:auto;
+    display:inline-block;
+    border-style:double;
+    border-color: red;
+    border:solid;
+}
+mat-card-title-group{
+    margin: auto;
+    display: inline;
+}
+button{
+    background-color:cornflowerblue;
+}
