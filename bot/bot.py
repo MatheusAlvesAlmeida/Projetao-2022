@@ -1,3 +1,4 @@
+from click import confirm
 from sympy import Ge
 from telegram.ext.updater import Updater
 from telegram.update import Update
@@ -8,6 +9,8 @@ from telegram.ext.filters import Filters
 import requests
 import time
 import json
+from datetime import datetime, timedelta
+
 
 import speeches
 from user_repository import user_repository
@@ -25,7 +28,7 @@ class TelegramBot:
     def __init__(self):
         self.url_base = f'https://api.telegram.org/bot{telegram_token}/'
         self.user_repo = user_repository()
-
+        self.specialty_repo = ["Odontologia", "Pediatria", "Oftalmologia", "Urologia", "Ginecologia"]
 
     def Iniciar(self):
         update_id = None
@@ -79,18 +82,25 @@ class TelegramBot:
         next_message, update_id = self.get_next_message(update_id)
         option = next_message["message"]["text"]
         
+        user_infos = {
+            "cadastro_sus": cadastro_sus,
+            "name": name,
+            "gender": gender,
+            "phone_number": phone_number
+        }
+
         if option == "1":
             print("make_appointment")
-            #make_appointment_flux()
+            self.make_appointment_flux(update_id, last_chat_id, user_infos)
         elif option == "2":
             print("re_appointment")
-            #reappointment_flux()
+            self.remake_appointment_flux(update_id, last_chat_id, user_infos)
         elif option == "3":
             print("cancel_appointment")
-            #cancel_appointment_flux()
+            self.cancel_appointment_flux(update_id, last_chat_id, user_infos)
         elif option == "4":
             print("check_appointment")
-            #check_appointment_flux()
+            self.check_appointment_flux(update_id, last_chat_id, user_infos)
         elif option == "5":
             self.responder(speeches.users_speech['acs_notified'], last_chat_id)
             # TODO notify ACS someway
@@ -99,6 +109,79 @@ class TelegramBot:
         else:
             self.responder(speeches.users_speech['invalid'], last_chat_id)
     
+    def make_appointment_flux(self, update_id: int, chat_id: str, user_infos: dict):
+        """
+        """
+        self.responder(speeches.appointment_speech['specialty'], chat_id)
+        specialties_string, specialties_dict = self.getSpecialtyOptions()
+        self.responder(specialties_string, chat_id)
+        found = False
+        while(not found):
+            next_message, update_id = self.get_next_message(update_id)
+            specialty_number = next_message["message"]["text"]
+            if specialty_number.isnumeric():
+                specialty_number = int(specialty_number)
+                if specialty_number in specialties_dict:
+                    chosen_specialty = specialties_dict[specialty_number]
+                    found = True
+                else:
+                    self.responder(speeches.error_speech['invalid_number'], chat_id)
+            else:
+                self.responder(speeches.error_speech['only_numbers'], chat_id)
+        
+        self.responder(speeches.appointment_speech['date_time'], chat_id)
+        dates_string, dates_dict = self.getDatesOptions(chosen_specialty)
+        self.responder(dates_string, chat_id)
+        found = False
+        while(not found):
+            next_message, update_id = self.get_next_message(update_id)
+            date_number = next_message["message"]["text"]
+            if date_number.isnumeric():
+                date_number = int(date_number)
+                if date_number in dates_dict:
+                    chosen_date = dates_dict[date_number]
+                    found = True
+                else:
+                    self.responder(speeches.error_speech['invalid_number'], chat_id)
+            else:
+                self.responder(speeches.error_speech['only_numbers'], chat_id)
+
+        self.responder(speeches.appointment_speech['user_confirmation'], chat_id)
+        next_message, update_id = self.get_next_message(update_id)
+        confirmation = next_message["message"]["text"].strip().lower()
+        repeat = True
+        while (repeat):
+            if confirmation == "1" or confirmation == "sim":
+                confirmation = True
+                repeat = False
+            elif confirmation == "2" or confirmation == "nao":
+                confirmation = False
+                repeat = False
+            else:
+                self.responder(speeches.error_speech['invalid_number'], chat_id)
+
+        if confirmation:
+            user_infos["chosen_specialty"] = chosen_specialty
+            user_infos["chosen_date"] = chosen_date
+            user_infos["chat_id"] = chat_id
+
+            # Pass all the collected information (in the user_infos) to the ACS,
+            # including the chat_id, so that when the ACS confirms or not the
+            # appointment, we can send a message to this user
+            self.responder(speeches.appointment_speech['request_sent'], chat_id)
+
+    def remake_appointment_flux(update_id: int):
+        """
+        """
+    
+    def cancel_appointment_flux(update_id: int):
+        """
+        """
+
+    def check_appointment_flux(update_id: int):
+        """
+        """
+
     # Obter mensagens
     def get_next_message(self, update_id: int):
         """
@@ -127,3 +210,39 @@ class TelegramBot:
     def responder(self, resposta, chat_id):
         link_requisicao = f'{self.url_base}sendMessage?chat_id={chat_id}&text={resposta}'
         requests.get(link_requisicao)
+
+    def getSpecialtyOptions(self):
+        """
+        returns a formatted string containing the list of specialties offered by the UBS
+        and a dict where each specialty is linked to its position in the list, so that the bot can
+        interpret each option
+        """
+        string_output = ""
+        dict_output = {}
+        for count, item in enumerate(self.specialty_repo):
+            index = count + 1
+            string_output += (str(index) + " - " + item + "\n")
+            dict_output[index] = item
+        
+        return string_output, dict_output
+
+    def getDatesOptions(self, specialty: str):
+        """
+        returns a formatted string containing the next 10 free slots of the chosen specialty offered by the UBS
+        and a dict where each date-time is linked to its position in the list, so that the bot can
+        interpret each option
+        """
+        string_output = ""
+        dict_output = {}
+        # free_dates = get_next_free_slots(specialty)
+        # TODO get from DB
+        free_dates = []
+        for i in range(10):
+            free_dates.append(datetime.today() + timedelta(days=1))
+
+        for count, item in enumerate(free_dates):
+            index = count + 1
+            string_output += (str(index) + " - " + str(item) + "\n")
+            dict_output[index] = item
+        
+        return string_output, dict_output

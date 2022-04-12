@@ -7,6 +7,7 @@ denial_speech = dict()
 check_appointment_speech = dict()
 reschedule_speech = dict()
 cancel_speech = dict()
+error_speech = dict()
 
 #Registering a new user
 register_speech['hello'] = "Parece que é a primeira vez que você usa os serviços do atendente virtual, então vamos precisar fazer um rápido cadastro para que eu possa te conhecer melhor! Primeiro, qual o seu nome completo?"
@@ -23,7 +24,7 @@ users_speech['invalid'] = "Opção inválida."
 
 
 #Make an appointment
-appointment_speech['specialty'] = "Para qual especialidade você gostaria de marcar consulta? <especialidades>"
+appointment_speech['specialty'] = "Para qual especialidade você gostaria de marcar consulta?"
 #<especialidade>, <nome_ubs>, <horarios>
 appointment_speech['date_time'] = "Esses são os próximos 10 horários disponíveis para {} em {}. Escolha o que mais lhe agrada: {}"
 #<especialidade>, <nome ubs>, <horário escolhido>
@@ -61,3 +62,6 @@ cancel_speech['specialty'] = "Para qual especialidade você gostaria de reagenda
 #<especialidade_escolhida>, <nome_UBS>, <especialidade_escolhida>, <dia_escolhido>
 cancel_speech['user_confirmation'] = "Você confirma que deseja cancelar uma consulta para {}, na {}, no seguinte horário: {} do dia: {}? \n 1) Sim 2) Não "
 cancel_speech['acs_notified']  = "Seu pedido de cancelamento de consulta foi encaminhado para ACS responsável."
+
+error_speech['invalid_number'] = "Inválido. Pode repetir? Dessa vez, escolha apenas um número das opções listadas anteriormente."
+error_speech['only_numbers'] = "Pode repetir? Dessa vez, apenas o número, por favor!"
