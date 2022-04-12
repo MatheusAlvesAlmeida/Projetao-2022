@@ -1,2 +1,6 @@
-.env
-__pycache__
+bot/.env
+bot/__pycache__
+
+frontend-acs/.angular
+frontend-acs/.vscode
+frontend-acs/node_modules
