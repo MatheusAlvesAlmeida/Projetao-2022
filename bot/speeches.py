@@ -1,4 +1,5 @@
-greetings_speech = "Olá! Eu sou o atendente virtual da UBS <nome_UBS>! Para poder te atender, eu preciso do seu número de cadastro do SUS. Informe apenas o número logo após essa mensagem!"
+#insert ubs name
+greetings_speech = "Olá! Eu sou o atendente virtual da UBS {}! Para poder te atender, eu preciso do seu número de cadastro do SUS. Informe apenas o número logo após essa mensagem!"
 register_speech = dict()
 users_speech = dict()
 appointment_speech = dict()
@@ -23,28 +24,40 @@ users_speech['invalid'] = "Opção inválida."
 
 #Make an appointment
 appointment_speech['specialty'] = "Para qual especialidade você gostaria de marcar consulta? <especialidades>"
-appointment_speech['date_time'] = "Esses são os próximos 10 horários disponíveis para <especialidade_escolhida> em <nome_UBS>. Escolha o que mais lhe agrada: <Horários>"
-appointment_speech['user_confirmation'] = "Você confirma que deseja marcar uma consulta para <especialidade_escolhida>, na <nome_UBS>, no seguinte horário: <horário_escolhido>? \n1) Sim. \n2) Não."
+#<especialidade>, <nome_ubs>, <horarios>
+appointment_speech['date_time'] = "Esses são os próximos 10 horários disponíveis para {} em {}. Escolha o que mais lhe agrada: {}"
+#<especialidade>, <nome ubs>, <horário escolhido>
+appointment_speech['user_confirmation'] = "Você confirma que deseja marcar uma consulta para {}, na {}, no seguinte horário: {}? \n1) Sim. \n2) Não."
 appointment_speech['apointment_ending'] = "Seu pedido de agendamento de consulta foi encaminhado para o ACS responsável. Assim que ele processar seu pedido, eu te avisarei!"
-appointment_speech['acs_confirmation'] = "O ACS responsável confirmou o seu agendamento. Fique atento para as datas e não se esqueça de solicitar o reagendamento caso não seja possível comparecer no dia. Use esse link para adicionar a consulta como evento ao seu calendário: <link google calendar> "
+#<link do calendar>
+appointment_speech['acs_confirmation'] = "O ACS responsável confirmou o seu agendamento. Fique atento para as datas e não se esqueça de solicitar o reagendamento caso não seja possível comparecer no dia. Use esse link para adicionar a consulta como evento ao seu calendário: {}"
 
 #Appointment denial
-denial_speech['acs_denial'] = "O ACS responsável não foi capaz de confirmar o seu agendamento."
+#<especialidade>, <nome_ubs>, <horário>
+denial_speech['acs_denial'] = "O ACS responsável não foi capaz de confirmar o seu agendamento para {} em {} no horário {}. "
 denial_speech['talk_to_acs'] = "Gostaria de falar diretamente com ele ou quer tentar novamente?\n1)  Solicitar um contato com o ACS. Ele entrará em contato com você assim que estiver disponível. \n2) Tentar novamente"
 denial_speech['acs_notified'] = "O ACS responsável foi notificado e entrará em contato com você em breve!"
 
 #Check appointments
-check_appointment_speech['confirmed'] = "Esses são os seus agendamentos confirmados:<agendamentos já confirmados que o usuário solicitou, no formato:especialidade: dd/mm/aaaa."
-check_appointment_speech['pending']= "Esses são os seus agendamentos ainda pendentes:<agendamentos ainda pendentes que o usuário solicitou, no formato:especialidade: dd/mm/aaaa."
+#<agendamentos já confirmados que o usuário solicitou, no formato:especialidade: dd/mm/aaaa.
+check_appointment_speech['confirmed'] = "Esses são os seus agendamentos confirmados: {}"
+#<agendamentos ainda pendentes que o usuário solicitou, no formato:especialidade: dd/mm/aaaa
+check_appointment_speech['pending']= "Esses são os seus agendamentos ainda pendentes:{}"
 
 #Reschedule appointment
-reschedule_speech['specialty'] = "Para qual especialidade você gostaria de reagendar a consulta? <especialidades com agendamento>"
-reschedule_speech['date_time'] = "Esses são os próximos 10 horários disponíveis para <especialidade> em <UBS>: <horarios>"
-reschedule_speech['user_confirmation']= "Você confirma que deseja solicitar remarcação de consulta para <especialidade>, na <nome_UBS>, no seguinte horário: <horário_escolhido>? \n1) Sim \n2) Não"
+#<especialidades com agendamento>
+reschedule_speech['specialty'] = "Para qual especialidade você gostaria de reagendar a consulta? {}"
+#<especialidade>, <nome_UBS>,<horarios>
+reschedule_speech['date_time'] = "Esses são os próximos 10 horários disponíveis para {} em {}: {}"
+#<especialidade>, <nome_UBS>,<horario_selecionado>
+reschedule_speech['user_confirmation']= "Você confirma que deseja solicitar remarcação de consulta para {}, na {}, no seguinte horário: {} ? \n1) Sim \n2) Não"
 reschedule_speech['request_sent'] = "Seu pedido de agendamento de consulta foi encaminhado para o ACS responsável. Assim que ele processar seu pedido, eu te avisarei!"
-reschedule_speech['acs_confirmation'] = "O ACS responsável confirmou o seu reagendamento. Fique atento para as datas e não se esqueça de solicitar o reagendamento caso não seja possível comparecer no dia. Use esse link para adicionar a consulta como evento ao seu calendário: <link google calendar> "
+#<link google calendar>
+reschedule_speech['acs_confirmation'] = "O ACS responsável confirmou o seu reagendamento. Fique atento para as datas e não se esqueça de solicitar o reagendamento caso não seja possível comparecer no dia. Use esse link para adicionar a consulta como evento ao seu calendário: {}"
 
 #Cancel appointment
-cancel_speech['specialty'] = "Para qual especialidade você gostaria de reagendar a consulta? <especialidades com agendamento>"
-cancel_speech['user_confirmation'] = "Você confirma que deseja cancelar uma consulta para <especialidade_escolhida>, na <nome_UBS>, no seguinte horário: <horário_escolhido> do dia: <dia_escolhido>? \n 1) Sim 2) Não "
+#<especialidades com agendamento>
+cancel_speech['specialty'] = "Para qual especialidade você gostaria de reagendar a consulta? {}"
+#<especialidade_escolhida>, <nome_UBS>, <especialidade_escolhida>, <dia_escolhido>
+cancel_speech['user_confirmation'] = "Você confirma que deseja cancelar uma consulta para {}, na {}, no seguinte horário: {} do dia: {}? \n 1) Sim 2) Não "
 cancel_speech['acs_notified']  = "Seu pedido de cancelamento de consulta foi encaminhado para ACS responsável."
