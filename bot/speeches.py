@@ -35,8 +35,8 @@ denial_speech['talk_to_acs'] = "Gostaria de falar diretamente com ele ou quer te
 denial_speech['acs_notified'] = "O ACS responsável foi notificado e entrará em contato com você em breve!"
 
 #Check appointments
-check_appointment_speech['confirmed'] = "Esses são os seus agendamentos confirmados:<agendamentos já confirmados que o usuário solicitou, no formato:especialidade: dd/mm/aaaa."
-check_appointment_speech['pending']= "Esses são os seus agendamentos ainda pendentes:<agendamentos ainda pendentes que o usuário solicitou, no formato:especialidade: dd/mm/aaaa."
+check_appointment_speech['confirmed'] = "Esses são os seus agendamentos confirmados:"
+check_appointment_speech['pending']= "Esses são os seus agendamentos ainda pendentes:"
 
 #Reschedule appointment
 reschedule_speech['specialty'] = "Para qual especialidade você gostaria de reagendar a consulta? <especialidades com agendamento>"
