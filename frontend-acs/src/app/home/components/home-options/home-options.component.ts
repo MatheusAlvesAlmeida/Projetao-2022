@@ -13,6 +13,8 @@ export interface suggestionDates {
 const ELEMENT_DATA: suggestionDates[] = [
   { id: 1, name: 'Gabriel', service: "Urologista", timestamp: '09:00 - 05/05/2022' },
   { id: 2, name: 'Pietro', service: "Dentista", timestamp: '09:00 - 04/05/2022' },
+  { id: 3, name: 'João Plácido', service: "Dentista", timestamp: '10:00 - 06/05/2022' },
+  { id: 4, name: 'Luisa', service: "Dentista", timestamp: '10:00 - 08/05/2022' },
 ];
 
 @Component({

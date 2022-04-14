@@ -1,7 +1,52 @@
 table {
     width: 100%;
+    min-width: 70%;
   }
   
-  button {
+button {
     margin: 16px 8px;
-  }
+}
+
+.options{
+  background-color: antiquewhite;
+  margin: auto;
+  max-width: 70%;
+  min-height: 700px;
+  min-width: 440px;
+}
+div{
+  background-color:antiquewhite;
+}
+.mat-header-cell{
+  background-color: green;
+  color: white;
+}
+
+.mat-column-name{
+  width: 32px;
+  border-right: 1px solid currentColor;
+  padding-right: 24px;
+  text-align: center;
+}
+
+.mat-column-service{
+  width: 32px;
+  border-right: 1px solid currentColor;
+  padding-right: 24px;
+  padding-left: 24px;
+  text-align: center;
+}
+
+.mat-column-timestamp{
+  width: 32px;
+  border-right: 1px solid currentColor;
+  padding-right: 24px;
+  padding-left: 24px;
+  text-align: center;
+}
+.mat-column-actions{
+  width: 32px;
+  padding-right: 24px;
+  padding-left: 24px;
+  text-align: center;
+}
