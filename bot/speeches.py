@@ -55,10 +55,9 @@ reschedule_speech['request_sent'] = "Seu pedido de agendamento de consulta foi e
 reschedule_speech['acs_confirmation'] = "O ACS responsável confirmou o seu reagendamento. Fique atento para as datas e não se esqueça de solicitar o reagendamento caso não seja possível comparecer no dia. Use esse link para adicionar a consulta como evento ao seu calendário: {}"
 
 #Cancel appointment
-#<especialidades com agendamento>
-cancel_speech['specialty'] = "Para qual especialidade você gostaria de reagendar a consulta? {}"
 #<especialidade_escolhida>, <nome_UBS>, <especialidade_escolhida>, <dia_escolhido>
 cancel_speech['user_confirmation'] = "Você confirma que deseja cancelar uma consulta para {}, na {}, no seguinte horário: {} do dia: {}? \n 1) Sim 2) Não "
+cancel_speech['appointment'] = "Qual agendamento você gostaria de cancelar?"
 cancel_speech['acs_notified']  = "Seu pedido de cancelamento de consulta foi encaminhado para ACS responsável."
 
 error_speech['invalid_number'] = "Inválido. Pode repetir? Dessa vez, escolha apenas um número das opções listadas anteriormente."

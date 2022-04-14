@@ -1,5 +1,3 @@
-from click import confirm
-from sympy import Ge
 from telegram.ext.updater import Updater
 from telegram.update import Update
 from telegram.ext.callbackcontext import CallbackContext
@@ -7,7 +5,6 @@ from telegram.ext.commandhandler import CommandHandler
 from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
 import requests
-import time
 import json
 from datetime import datetime, timedelta
 
@@ -177,9 +174,56 @@ class TelegramBot:
         """
         """
     
-    def cancel_appointment_flux(update_id: int):
+    def cancel_appointment_flux(self, update_id: int, chat_id: str, user_infos: dict):
         """
         """
+        self.responder(speeches.cancel_speech['appointment'], chat_id)
+
+        appointments_string, appointments_dict = self.get_all_appointments(
+            user_infos["cadastro_sus"]
+        )
+
+        self.responder(appointments_string, chat_id)
+
+        found = False
+        while(not found):
+            next_message, update_id = self.get_next_message(update_id)
+            appointment_number = next_message["message"]["text"]
+            if appointment_number.isnumeric():
+                appointment_number = int(appointment_number)
+                if appointment_number in appointments_dict:
+                    (appointment, is_appointment_confirmed) = appointments_dict[appointment_number]
+                    found = True
+                else:
+                    self.responder(speeches.error_speech['invalid_number'], chat_id)
+            else:
+                self.responder(speeches.error_speech['only_numbers'], chat_id)
+
+        user_infos["chosen_specialty"] = appointment["specialty"]
+        user_infos["chosen_date"] = appointment["date_hour"]
+        user_infos["chat_id"] = chat_id
+
+        self.responder(speeches.cancel_speech["user_confirmation"], chat_id)
+        next_message, update_id = self.get_next_message(update_id)
+        confirmation = next_message["message"]["text"].strip().lower()
+        repeat = True
+        while (repeat):
+            if confirmation == "1" or confirmation == "sim":
+                confirmation = True
+                repeat = False
+            elif confirmation == "2" or confirmation == "nao":
+                confirmation = False
+                repeat = False
+            else:
+                self.responder(speeches.error_speech['invalid_number'], chat_id)
+        
+        if confirmation:
+            if is_appointment_confirmed:
+                AcsFunctions.cancel_appointment(user_infos)
+            else:
+                DbFunctions.cancel_unconfirmed_appointment(user_infos)
+            
+            self.responder(speeches.cancel_speech["acs_notified"], chat_id)
 
     def check_appointment_flux(self, update_id: int, chat_id: str, user_infos: dict):
         """
@@ -194,7 +238,7 @@ class TelegramBot:
         confirmed_output = ""
         for count, item in enumerate(confirmed_appointments_list):
             index = count + 1
-            confirmed_output += (str(index) + " - " + str(item) + "\n")
+            confirmed_output += (str(index) + " - " + str(item["specialty"]) + " - " + str(item["date_hour"]) + "\n")
         
         self.responder(confirmed_output, chat_id)
 
@@ -203,8 +247,8 @@ class TelegramBot:
         pending_output = ""
         for count, item in enumerate(pending_appointments_list):
             index = count + 1
-            pending_output += (str(index) + " - " + str(item) + "\n")
-        
+            pending_output += (str(index) + " - " + str(item["specialty"]) + " - " + str(item["date_hour"]) + "\n")
+
         self.responder(pending_output, chat_id)
         
     # Obter mensagens
@@ -219,7 +263,6 @@ class TelegramBot:
             return resultado["result"][-1], update_id
         return None
 
-
     def get_last_message(self, update_id):
         """
         Get the last received message, from the given update_id.
@@ -231,7 +274,6 @@ class TelegramBot:
         resultado = json.loads(requests.get(link_requisicao).content)
         return resultado["result"][-1]
 
-    # Responder
     def responder(self, resposta, chat_id):
         link_requisicao = f'{self.url_base}sendMessage?chat_id={chat_id}&text={resposta}'
         requests.get(link_requisicao)
@@ -271,5 +313,34 @@ class TelegramBot:
             dict_output[index] = item
         
         return string_output, dict_output
+
+    def get_all_appointments(self, cadastro_sus: str):
+        """
+        returns a string informing all appointments of a given cadastro_sus
+        and a dict linking the index numbers on the string to each appoitment object.
+        """
+        confirmed_appointments_list, pending_appointments_list = (
+            DbFunctions.get_next_appointments_from_user(
+                cadastro_sus
+            )
+        )
+
+        dict_output = {}
+        string_output = ""
+
+        index = 1
+        for item in confirmed_appointments_list:
+            dict_output[index] = (item, True)
+            string_output += (str(index) + " - " + str(item["specialty"]) + " - " + str(item["date_hour"]) + "\n")
+            index += 1
+
+        for item in pending_appointments_list:
+            dict_output[index] = (item, False)
+            string_output += (str(index) + " - " + str(item["specialty"]) + " - " + str(item["date_hour"]) + "\n")
+            index += 1
+
+        return string_output, dict_output
+
+
 
  
