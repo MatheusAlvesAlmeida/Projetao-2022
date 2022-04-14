@@ -46,7 +46,7 @@ reschedule_speech['request_sent'] = "Seu pedido de agendamento de consulta foi e
 reschedule_speech['acs_confirmation'] = "O ACS responsável confirmou o seu reagendamento. Fique atento para as datas e não se esqueça de solicitar o reagendamento caso não seja possível comparecer no dia. Use esse link para adicionar a consulta como evento ao seu calendário: <link google calendar> "
 
 #Cancel appointment
-cancel_speech['specialty'] = "Para qual especialidade você gostaria de reagendar a consulta? <especialidades com agendamento>"
+cancel_speech['appointment'] = "Qual agendamento você gostaria de cancelar?"
 cancel_speech['user_confirmation'] = "Você confirma que deseja cancelar uma consulta para <especialidade_escolhida>, na <nome_UBS>, no seguinte horário: <horário_escolhido> do dia: <dia_escolhido>? \n 1) Sim 2) Não "
 cancel_speech['acs_notified']  = "Seu pedido de cancelamento de consulta foi encaminhado para ACS responsável."
 

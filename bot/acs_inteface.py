@@ -8,8 +8,13 @@ class AcsFunctions:
         """
     
     @staticmethod
-    def notify_acs_appointment(appointment_infos: dict):
+    def make_appointment(user_appointment_infos: dict):
         """
         Receives a dict containing all the information needed by the ACS to make an appointment.
         Sends the request to the ACS appointment requests list interface.
+        """
+    
+    @staticmethod
+    def cancel_appointment(user_appointment_infos: dict):
+        """
         """
