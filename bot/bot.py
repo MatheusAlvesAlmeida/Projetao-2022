@@ -15,7 +15,8 @@ from datetime import datetime, timedelta
 import speeches
 from user_repository import user_repository
 from config import telegram_token
-
+from acs_inteface import AcsFunctions
+from db_interface import DbFunctions
 # def pretty(d, indent=0):
 #     for key, value in d.items():
 #         print('\t' * indent + str(key))
@@ -104,6 +105,7 @@ class TelegramBot:
         elif option == "5":
             self.responder(speeches.users_speech['acs_notified'], last_chat_id)
             # TODO notify ACS someway
+            AcsFunctions.notify_acs_contact(user_infos)
         elif option == "6":
             self.responder(speeches.users_speech['end'], last_chat_id)
         else:
@@ -168,7 +170,8 @@ class TelegramBot:
             # Pass all the collected information (in the user_infos) to the ACS,
             # including the chat_id, so that when the ACS confirms or not the
             # appointment, we can send a message to this user
-            self.responder(speeches.appointment_speech['request_sent'], chat_id)
+            AcsFunctions.notify_acs_appointment(user_infos)
+            self.responder(speeches.appointment_speech['apointment_ending'], chat_id)
 
     def remake_appointment_flux(update_id: int):
         """
@@ -178,10 +181,32 @@ class TelegramBot:
         """
         """
 
-    def check_appointment_flux(update_id: int):
+    def check_appointment_flux(self, update_id: int, chat_id: str, user_infos: dict):
         """
         """
+        confirmed_appointments_list, pending_appointments_list = (
+            DbFunctions.get_next_appointments_from_user(
+                user_infos["cadastro_sus"]
+            )
+        )
+        self.responder(speeches.check_appointment_speech['confirmed'], chat_id)
+        
+        confirmed_output = ""
+        for count, item in enumerate(confirmed_appointments_list):
+            index = count + 1
+            confirmed_output += (str(index) + " - " + str(item) + "\n")
+        
+        self.responder(confirmed_output, chat_id)
 
+        self.responder(speeches.check_appointment_speech['pending'], chat_id)
+        
+        pending_output = ""
+        for count, item in enumerate(pending_appointments_list):
+            index = count + 1
+            pending_output += (str(index) + " - " + str(item) + "\n")
+        
+        self.responder(pending_output, chat_id)
+        
     # Obter mensagens
     def get_next_message(self, update_id: int):
         """
@@ -234,8 +259,8 @@ class TelegramBot:
         """
         string_output = ""
         dict_output = {}
-        # free_dates = get_next_free_slots(specialty)
         # TODO get from DB
+        # free_dates = DbFunctions.get_next_free_slots_for_specialty(specialty)
         free_dates = []
         for i in range(10):
             free_dates.append(datetime.today() + timedelta(days=1))
@@ -246,3 +271,5 @@ class TelegramBot:
             dict_output[index] = item
         
         return string_output, dict_output
+
+ 
