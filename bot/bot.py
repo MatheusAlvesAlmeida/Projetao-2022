@@ -14,13 +14,6 @@ from user_repository import user_repository
 from config import telegram_token
 from acs_inteface import AcsFunctions
 from db_interface import DbFunctions
-# def pretty(d, indent=0):
-#     for key, value in d.items():
-#         print('\t' * indent + str(key))
-#         if isinstance(value, dict):
-#             pretty(value, indent+1)
-#         else:
-#             print('\t' * (indent+1) + str(value))
 
 class TelegramBot:
     def __init__(self):
@@ -91,15 +84,12 @@ class TelegramBot:
             print("make_appointment")
             self.make_appointment_flux(update_id, last_chat_id, user_infos)
         elif option == "2":
-            print("re_appointment")
-            self.remake_appointment_flux(update_id, last_chat_id, user_infos)
-        elif option == "3":
             print("cancel_appointment")
             self.cancel_appointment_flux(update_id, last_chat_id, user_infos)
-        elif option == "4":
+        elif option == "3":
             print("check_appointment")
             self.check_appointment_flux(update_id, last_chat_id, user_infos)
-        elif option == "5":
+        elif option == "4":
             self.responder(speeches.users_speech['acs_notified'], last_chat_id)
             # TODO notify ACS someway
             AcsFunctions.notify_acs_contact(user_infos)
@@ -169,10 +159,6 @@ class TelegramBot:
             # appointment, we can send a message to this user
             AcsFunctions.notify_acs_appointment(user_infos)
             self.responder(speeches.appointment_speech['apointment_ending'], chat_id)
-
-    def remake_appointment_flux(update_id: int):
-        """
-        """
     
     def cancel_appointment_flux(self, update_id: int, chat_id: str, user_infos: dict):
         """
@@ -251,7 +237,6 @@ class TelegramBot:
 
         self.responder(pending_output, chat_id)
         
-    # Obter mensagens
     def get_next_message(self, update_id: int):
         """
         get the next message the user will send from this update_id.
