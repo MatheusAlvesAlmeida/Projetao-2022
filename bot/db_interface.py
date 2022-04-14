@@ -19,8 +19,8 @@ class DbFunctions:
         Returns 2 lists containing the confirmed appointments and the pending appointments,
         respectively.
         """
-        confirmed_appointments_list = []
-        pending_appointments_list = []
+        confirmed_appointments_list = ["apt1", "apt3"]
+        pending_appointments_list = ["apt2"]
 
         return confirmed_appointments_list, pending_appointments_list
 
