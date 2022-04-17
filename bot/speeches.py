@@ -16,8 +16,8 @@ register_speech['phone'] = "Qual o seu telefone para contato?"
 register_speech['success'] = "Pronto, seu cadastro foi realizado para os serviços do atendente virtual!"
 register_speech['failure'] = "Infelizmente não foi possível realizar o seu cadastro nesse momento. Tente novamente mais tarde."
 
-#Registered useres
-users_speech['hello'] = "Olá {}! Em que posso ajudar?\n1) Solicitar agendamento.\n2) Solicitar reagendamento.\n3) Solicitar cancelamento.\n4) Consultar agendamentos. \n5) Conversar com o meu ACS. \n6) Nada."
+#Registered users
+users_speech['hello'] = "Olá {}! Em que posso ajudar?\n1) Solicitar agendamento.\n2) Solicitar cancelamento.\n3) Consultar agendamentos. \n4) Conversar com o meu ACS. \n5) Nada."
 users_speech['acs_notified'] = "O ACS responsável foi notificado e entrará em contato com você em breve!"
 users_speech['end'] = "Então até a próxima!"
 users_speech['invalid'] = "Opção inválida."
@@ -25,13 +25,13 @@ users_speech['invalid'] = "Opção inválida."
 
 #Make an appointment
 appointment_speech['specialty'] = "Para qual especialidade você gostaria de marcar consulta?"
-#<especialidade>, <nome_ubs>, <horarios>
-appointment_speech['date_time'] = "Esses são os próximos 10 horários disponíveis para {} em {}. Escolha o que mais lhe agrada:"
+#<especialidade>
+appointment_speech['date_time'] = "Esses são os próximos 10 horários disponíveis para {}. Escolha o que mais lhe agrada:"
 #<especialidade>, <nome ubs>, <horário escolhido>
-appointment_speech['user_confirmation'] = "Você confirma que deseja marcar uma consulta para {}, na {}, no seguinte horário: {}? \n1) Sim. \n2) Não."
+appointment_speech['user_confirmation'] = "Você confirma que deseja marcar uma consulta para {}, na UBS {}, no seguinte horário: {}? \n1) Sim. \n2) Não."
 appointment_speech['apointment_ending'] = "Seu pedido de agendamento de consulta foi encaminhado para o ACS responsável. Assim que ele processar seu pedido, eu te avisarei!"
 #<link do calendar>
-appointment_speech['acs_confirmation'] = "O ACS responsável confirmou o seu agendamento. Fique atento para as datas e não se esqueça de solicitar o reagendamento caso não seja possível comparecer no dia. Use esse link para adicionar a consulta como evento ao seu calendário: {}"
+appointment_speech['acs_confirmation'] = "O ACS responsável confirmou o seu agendamento. Fique atento para a data e caso não seja possível comparecer no dia, solicite um cancelamento e depois agende novamente! Use esse link para adicionar a consulta como evento ao seu calendário: {}"
 
 #Appointment denial
 #<especialidade>, <nome_ubs>, <horário>
@@ -44,8 +44,8 @@ check_appointment_speech['confirmed'] = "Esses são os seus agendamentos confirm
 check_appointment_speech['pending']= "Esses são os seus agendamentos ainda pendentes:"
 
 #Cancel appointment
-#<especialidade_escolhida>, <nome_UBS>, <especialidade_escolhida>, <dia_escolhido>
-cancel_speech['user_confirmation'] = "Você confirma que deseja cancelar uma consulta para {}, na {}, no seguinte horário: {} do dia: {}? \n 1) Sim 2) Não "
+#<especialidade_escolhida>, <nome_UBS>, <data_hora_escolhida>
+cancel_speech['user_confirmation'] = "Você confirma que deseja cancelar uma consulta para {}, na UBS {}, na data {}? \n 1) Sim 2) Não "
 cancel_speech['appointment'] = "Qual agendamento você gostaria de cancelar?"
 cancel_speech['acs_notified']  = "Seu pedido de cancelamento de consulta foi encaminhado para ACS responsável."
 

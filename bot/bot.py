@@ -1,19 +1,19 @@
-from telegram.ext.updater import Updater
-from telegram.update import Update
+from datetime import datetime, timedelta
+import requests
+import json
+
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.commandhandler import CommandHandler
 from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
-import requests
-import json
-from datetime import datetime, timedelta
+from telegram.ext.updater import Updater
+from telegram.update import Update
 
-
-import speeches
+from config import telegram_token, ubs_name
 from user_repository import user_repository
-from config import telegram_token
 from acs_inteface import AcsFunctions
 from db_interface import DbFunctions
+import speeches
 
 class TelegramBot:
     def __init__(self):
@@ -27,7 +27,7 @@ class TelegramBot:
         update_id = int(last_message["update_id"])
         last_chat_id = last_message["message"]["chat"]["id"]
 
-        self.responder(speeches.greetings_speech, last_chat_id)
+        self.responder(speeches.greetings_speech.format(ubs_name), last_chat_id)
         next_message, update_id = self.get_next_message(update_id)
         cadastro_sus = next_message["message"]["text"]
 
@@ -68,7 +68,7 @@ class TelegramBot:
         gender = user["gender"]
         phone_number = user["phone_number"]
 
-        greetings_text = speeches.users_speech['hello'] % (name)
+        greetings_text = speeches.users_speech['hello'].format(name)
         self.responder(greetings_text, last_chat_id)
         next_message, update_id = self.get_next_message(update_id)
         option = next_message["message"]["text"]
@@ -81,19 +81,16 @@ class TelegramBot:
         }
 
         if option == "1":
-            print("make_appointment")
             self.make_appointment_flux(update_id, last_chat_id, user_infos)
         elif option == "2":
-            print("cancel_appointment")
             self.cancel_appointment_flux(update_id, last_chat_id, user_infos)
         elif option == "3":
-            print("check_appointment")
             self.check_appointment_flux(update_id, last_chat_id, user_infos)
         elif option == "4":
             self.responder(speeches.users_speech['acs_notified'], last_chat_id)
             # TODO notify ACS someway
             AcsFunctions.notify_acs_contact(user_infos)
-        elif option == "6":
+        elif option == "5":
             self.responder(speeches.users_speech['end'], last_chat_id)
         else:
             self.responder(speeches.users_speech['invalid'], last_chat_id)
@@ -118,7 +115,7 @@ class TelegramBot:
             else:
                 self.responder(speeches.error_speech['only_numbers'], chat_id)
         
-        self.responder(speeches.appointment_speech['date_time'], chat_id)
+        self.responder(speeches.appointment_speech['date_time'].format(chosen_specialty), chat_id)
         dates_string, dates_dict = self.getDatesOptions(chosen_specialty)
         self.responder(dates_string, chat_id)
         found = False
@@ -135,7 +132,7 @@ class TelegramBot:
             else:
                 self.responder(speeches.error_speech['only_numbers'], chat_id)
 
-        self.responder(speeches.appointment_speech['user_confirmation'], chat_id)
+        self.responder(speeches.appointment_speech['user_confirmation'].format(chosen_specialty, ubs_name, chosen_date), chat_id)
         next_message, update_id = self.get_next_message(update_id)
         confirmation = next_message["message"]["text"].strip().lower()
         repeat = True
@@ -157,9 +154,11 @@ class TelegramBot:
             # Pass all the collected information (in the user_infos) to the ACS,
             # including the chat_id, so that when the ACS confirms or not the
             # appointment, we can send a message to this user
-            AcsFunctions.notify_acs_appointment(user_infos)
+            AcsFunctions.make_appointment(user_infos)
             self.responder(speeches.appointment_speech['apointment_ending'], chat_id)
-    
+            # TODO if the ACS confirms or not the appointment, we need to user speech in
+            # appointment_speech['acs_confirmation'] or appointment_speech['acs_denial']
+
     def cancel_appointment_flux(self, update_id: int, chat_id: str, user_infos: dict):
         """
         """
@@ -189,7 +188,9 @@ class TelegramBot:
         user_infos["chosen_date"] = appointment["date_hour"]
         user_infos["chat_id"] = chat_id
 
-        self.responder(speeches.cancel_speech["user_confirmation"], chat_id)
+        self.responder(speeches.cancel_speech['user_confirmation'].format(
+            user_infos["chosen_specialty"], ubs_name, user_infos["chosen_date"],
+        ), chat_id)
         next_message, update_id = self.get_next_message(update_id)
         confirmation = next_message["message"]["text"].strip().lower()
         repeat = True
