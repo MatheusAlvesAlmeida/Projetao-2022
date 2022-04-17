@@ -8,6 +8,10 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 //Modules
 import { HomeModule } from './home/home.module';
+import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
+import { environment } from '../environments/environment';
+import { provideAuth,getAuth } from '@angular/fire/auth';
+import { provideFirestore,getFirestore } from '@angular/fire/firestore';
 
 @NgModule({
   declarations: [
@@ -18,7 +22,10 @@ import { HomeModule } from './home/home.module';
     AppRoutingModule,
     NoopAnimationsModule,
     HomeModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAuth(() => getAuth()),
+    provideFirestore(() => getFirestore())
   ],
   providers: [],
   bootstrap: [AppComponent]
