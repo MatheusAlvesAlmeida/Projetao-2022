@@ -1,5 +1,3 @@
-#insert ubs name
-greetings_speech = "Olá! Eu sou o atendente virtual da UBS {}! Para poder te atender, eu preciso do seu número de cadastro do SUS. Informe apenas o número logo após essa mensagem!"
 register_speech = dict()
 users_speech = dict()
 appointment_speech = dict()
@@ -8,6 +6,12 @@ check_appointment_speech = dict()
 reschedule_speech = dict()
 cancel_speech = dict()
 error_speech = dict()
+
+# Greeting user
+greetings_speech = "Olá! Eu sou o atendente virtual da UBS {}! Para poder te atender, eu preciso do seu número de cadastro do SUS. Informe apenas o número logo após essa mensagem!"
+
+# Asking user to wait
+wait_speech = "Estou muito ocupado nesse momento! Aguarde alguns minutos!"
 
 #Registering a new user
 register_speech['hello'] = "Parece que é a primeira vez que você usa os serviços do atendente virtual, então vamos precisar fazer um rápido cadastro para que eu possa te conhecer melhor! Primeiro, qual o seu nome completo?"

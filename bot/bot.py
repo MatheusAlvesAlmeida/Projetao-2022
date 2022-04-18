@@ -1,15 +1,9 @@
 from datetime import datetime, timedelta
 import requests
 import json
+import time
 
-from telegram.ext.callbackcontext import CallbackContext
-from telegram.ext.commandhandler import CommandHandler
-from telegram.ext.messagehandler import MessageHandler
-from telegram.ext.filters import Filters
-from telegram.ext.updater import Updater
-from telegram.update import Update
-
-from config import telegram_token, ubs_name
+from config import telegram_token, ubs_name, message_timeout
 from user_repository import user_repository
 from acs_inteface import AcsFunctions
 from db_interface import DbFunctions
@@ -19,28 +13,56 @@ class TelegramBot:
     def __init__(self):
         self.url_base = f'https://api.telegram.org/bot{telegram_token}/'
         self.user_repo = user_repository()
+        self.current_user_queue = []
         self.specialty_repo = ["Odontologia", "Pediatria", "Oftalmologia", "Urologia", "Ginecologia"]
 
-    def Iniciar(self):
-        update_id = None
-        last_message = self.get_last_message(update_id)
-        update_id = int(last_message["update_id"])
-        last_chat_id = last_message["message"]["chat"]["id"]
+    def start(self):
+        while(True):
+            result = self.get_last_update_result()
+            if len(result) > 0:
+                last_update_id = int(result[-1]["update_id"])
+                last_chat_id = result[-1]["message"]["chat"]["id"]
+                next_message_result, update_id = self.get_next_message_result(last_update_id, last_chat_id)
+                if len(next_message_result) > 0:
+                    chat_id = next_message_result[0]["message"]["chat"]["id"]
+                    if chat_id not in self.current_user_queue:
+                        self.current_user_queue.append(chat_id)
+                else:
+                    # Sleeps for some seconds before checking again
+                    time.sleep(5)
+            else:
+                # Sleeps for some seconds before checking again
+                time.sleep(5)
+            
+            while len(self.current_user_queue) > 0:
+                print(self.current_user_queue)
+                self.general_flux(update_id, self.current_user_queue.pop(0))
 
-        self.responder(speeches.greetings_speech.format(ubs_name), last_chat_id)
-        next_message, update_id = self.get_next_message(update_id)
+
+    def general_flux(self, update_id: int, chat_id: str):
+        self.responder(speeches.greetings_speech.format(ubs_name), chat_id)
+        result, update_id = self.get_next_message_result(update_id, chat_id)
+        if len(result) == 0:
+            return
+        next_message = result[0]
         cadastro_sus = next_message["message"]["text"]
 
         already_registered = self.user_repo.check_if_user_exists(cadastro_sus) # TODO check against DB
     
         if (not already_registered):
             # Register new user
-            self.responder(speeches.register_speech['hello'], last_chat_id)
-            next_message, update_id = self.get_next_message(update_id)
+            self.responder(speeches.register_speech['hello'], chat_id)
+            result, update_id = self.get_next_message_result(update_id, chat_id)
+            if len(result) == 0:
+                return
+            next_message = result[0]
             name = next_message["message"]["text"]
             
-            self.responder(speeches.register_speech['gender'], last_chat_id)
-            next_message, update_id = self.get_next_message(update_id)
+            self.responder(speeches.register_speech['gender'], chat_id)
+            result, update_id = self.get_next_message_result(update_id, chat_id)
+            if len(result) == 0:
+                return
+            next_message = result[0]
             gender = next_message["message"]["text"].strip().lower()
         
             if (gender == "1" or gender == "masculino"):
@@ -52,15 +74,18 @@ class TelegramBot:
             else:
                 gender = "OUTRO"
             
-            self.responder(speeches.register_speech['phone'], last_chat_id)
-            next_message, update_id = self.get_next_message(update_id)
+            self.responder(speeches.register_speech['phone'], chat_id)
+            result, update_id = self.get_next_message_result(update_id, chat_id)
+            if len(result) == 0:
+                return
+            next_message = result[0]
             phone_number = next_message["message"]["text"].strip()
 
             result = self.user_repo.register_new_user(cadastro_sus, name, gender, phone_number) # TODO call DB and register this
             if result:
-                self.responder(speeches.register_speech['success'], last_chat_id)
+                self.responder(speeches.register_speech['success'], chat_id)
             else:
-                self.responder(speeches.register_speech['failure'], last_chat_id)
+                self.responder(speeches.register_speech['failure'], chat_id)
 
         # Already registered
         user = self.user_repo.get_user(cadastro_sus) # TODO call DB and get this
@@ -69,8 +94,11 @@ class TelegramBot:
         phone_number = user["phone_number"]
 
         greetings_text = speeches.users_speech['hello'].format(name)
-        self.responder(greetings_text, last_chat_id)
-        next_message, update_id = self.get_next_message(update_id)
+        self.responder(greetings_text, chat_id)
+        result, update_id = self.get_next_message_result(update_id, chat_id)
+        if len(result) == 0:
+            return
+        next_message = result[0]
         option = next_message["message"]["text"]
         
         user_infos = {
@@ -81,19 +109,19 @@ class TelegramBot:
         }
 
         if option == "1":
-            self.make_appointment_flux(update_id, last_chat_id, user_infos)
+            self.make_appointment_flux(update_id, chat_id, user_infos)
         elif option == "2":
-            self.cancel_appointment_flux(update_id, last_chat_id, user_infos)
+            self.cancel_appointment_flux(update_id, chat_id, user_infos)
         elif option == "3":
-            self.check_appointment_flux(update_id, last_chat_id, user_infos)
+            self.check_appointment_flux(update_id, chat_id, user_infos)
         elif option == "4":
-            self.responder(speeches.users_speech['acs_notified'], last_chat_id)
+            self.responder(speeches.users_speech['acs_notified'], chat_id)
             # TODO notify ACS someway
             AcsFunctions.notify_acs_contact(user_infos)
         elif option == "5":
-            self.responder(speeches.users_speech['end'], last_chat_id)
+            self.responder(speeches.users_speech['end'], chat_id)
         else:
-            self.responder(speeches.users_speech['invalid'], last_chat_id)
+            self.responder(speeches.users_speech['invalid'], chat_id)
     
     def make_appointment_flux(self, update_id: int, chat_id: str, user_infos: dict):
         """
@@ -103,7 +131,10 @@ class TelegramBot:
         self.responder(specialties_string, chat_id)
         found = False
         while(not found):
-            next_message, update_id = self.get_next_message(update_id)
+            result, update_id = self.get_next_message_result(update_id, chat_id)
+            if len(result) == 0:
+                return
+            next_message = result[0]
             specialty_number = next_message["message"]["text"]
             if specialty_number.isnumeric():
                 specialty_number = int(specialty_number)
@@ -120,7 +151,10 @@ class TelegramBot:
         self.responder(dates_string, chat_id)
         found = False
         while(not found):
-            next_message, update_id = self.get_next_message(update_id)
+            result, update_id = self.get_next_message_result(update_id, chat_id)
+            if len(result) == 0:
+                return
+            next_message = result[0]
             date_number = next_message["message"]["text"]
             if date_number.isnumeric():
                 date_number = int(date_number)
@@ -133,7 +167,10 @@ class TelegramBot:
                 self.responder(speeches.error_speech['only_numbers'], chat_id)
 
         self.responder(speeches.appointment_speech['user_confirmation'].format(chosen_specialty, ubs_name, chosen_date), chat_id)
-        next_message, update_id = self.get_next_message(update_id)
+        result, update_id = self.get_next_message_result(update_id, chat_id)
+        if len(result) == 0:
+            return
+        next_message = result[0]
         confirmation = next_message["message"]["text"].strip().lower()
         repeat = True
         while (repeat):
@@ -172,7 +209,10 @@ class TelegramBot:
 
         found = False
         while(not found):
-            next_message, update_id = self.get_next_message(update_id)
+            result, update_id = self.get_next_message_result(update_id, chat_id)
+            if len(result) == 0:
+                return
+            next_message = result[0]
             appointment_number = next_message["message"]["text"]
             if appointment_number.isnumeric():
                 appointment_number = int(appointment_number)
@@ -191,7 +231,10 @@ class TelegramBot:
         self.responder(speeches.cancel_speech['user_confirmation'].format(
             user_infos["chosen_specialty"], ubs_name, user_infos["chosen_date"],
         ), chat_id)
-        next_message, update_id = self.get_next_message(update_id)
+        result, update_id = self.get_next_message_result(update_id, chat_id)
+        if len(result) == 0:
+            return
+        next_message = result[0]
         confirmation = next_message["message"]["text"].strip().lower()
         repeat = True
         while (repeat):
@@ -238,27 +281,41 @@ class TelegramBot:
 
         self.responder(pending_output, chat_id)
         
-    def get_next_message(self, update_id: int):
+    def get_next_message_result(self, update_id: int, chat_id: str):
         """
-        get the next message the user will send from this update_id.
+        get the next message the of a given chat.
+        In case of the next message being from another user, put it on the queue, and wait again for
+        expected one.
         """
-        if update_id:
-            update_id += 1
-            link_requisicao = f'{self.url_base}getUpdates?timeout=100&offset={update_id}'
-            resultado = json.loads(requests.get(link_requisicao).content)
-            return resultado["result"][-1], update_id
-        return None
+        update_id += 1
+        link_requisicao = f'{self.url_base}getUpdates?timeout={message_timeout}&offset={update_id}'
+        result = json.loads(requests.get(link_requisicao).content)["result"]
+        if len(result) == 0:
+            return result, update_id # timeout
 
-    def get_last_message(self, update_id):
+        message_chat_id = result[0]["message"]["chat"]["id"]
+
+        while message_chat_id != chat_id:
+            self.responder(speeches.wait_speech, message_chat_id)
+            if message_chat_id not in self.current_user_queue:
+                self.current_user_queue.append(message_chat_id)
+
+            update_id += 1
+            link_requisicao = f'{self.url_base}getUpdates?timeout={message_timeout}&offset={update_id}'
+            result = json.loads(requests.get(link_requisicao).content)["result"]
+            if len(result) == 0:
+                return result, update_id # timeout
+
+            message_chat_id = result[0]["message"]["chat"]["id"]
+            
+        return result, update_id
+
+    def get_last_update_result(self):
         """
-        Get the last received message, from the given update_id.
-        If None is passed as the update_id, returns the last message globally.
+        Get the last update object received globally.
         """
         link_requisicao = f'{self.url_base}getUpdates?timeout=100'
-        if update_id:
-            link_requisicao = f'{link_requisicao}&offset={update_id}'
-        resultado = json.loads(requests.get(link_requisicao).content)
-        return resultado["result"][-1]
+        return json.loads(requests.get(link_requisicao).content)["result"]
 
     def responder(self, resposta, chat_id):
         link_requisicao = f'{self.url_base}sendMessage?chat_id={chat_id}&text={resposta}'
@@ -326,7 +383,3 @@ class TelegramBot:
             index += 1
 
         return string_output, dict_output
-
-
-
- 
