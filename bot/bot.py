@@ -15,35 +15,38 @@ class TelegramBot:
         self.user_repo = user_repository()
         self.current_user_queue = []
         self.specialty_repo = ["Odontologia", "Pediatria", "Oftalmologia", "Urologia", "Ginecologia"]
+        self.sleep_time = 3
 
     def start(self):
         while(True):
-            result = self.get_last_update_result()
-            if len(result) > 0:
-                last_update_id = int(result[-1]["update_id"])
-                last_chat_id = result[-1]["message"]["chat"]["id"]
-                next_message_result, update_id = self.get_next_message_result(last_update_id, last_chat_id)
+            result = []
+            while len(result) == 0:
+                # Sleeps for some seconds before checking again
+                time.sleep(self.sleep_time)
+                result = self.get_last_update_result()
+
+            update_id = int(result[-1]["update_id"])
+            chat_id = result[-1]["message"]["chat"]["id"]
+
+            while (True):    
+                next_message_result, update_id = self.get_next_message_result(update_id, chat_id)
                 if len(next_message_result) > 0:
                     chat_id = next_message_result[0]["message"]["chat"]["id"]
                     if chat_id not in self.current_user_queue:
                         self.current_user_queue.append(chat_id)
                 else:
                     # Sleeps for some seconds before checking again
-                    time.sleep(5)
-            else:
-                # Sleeps for some seconds before checking again
-                time.sleep(5)
-            
-            while len(self.current_user_queue) > 0:
-                print(self.current_user_queue)
-                self.general_flux(update_id, self.current_user_queue.pop(0))
+                    time.sleep(self.sleep_time)
+
+                while len(self.current_user_queue) > 0:
+                    update_id = self.general_flux(update_id, self.current_user_queue.pop(0))
 
 
     def general_flux(self, update_id: int, chat_id: str):
         self.responder(speeches.greetings_speech.format(ubs_name), chat_id)
         result, update_id = self.get_next_message_result(update_id, chat_id)
         if len(result) == 0:
-            return
+            return update_id
         next_message = result[0]
         cadastro_sus = next_message["message"]["text"]
 
@@ -54,14 +57,14 @@ class TelegramBot:
             self.responder(speeches.register_speech['hello'], chat_id)
             result, update_id = self.get_next_message_result(update_id, chat_id)
             if len(result) == 0:
-                return
+                return update_id
             next_message = result[0]
             name = next_message["message"]["text"]
             
             self.responder(speeches.register_speech['gender'], chat_id)
             result, update_id = self.get_next_message_result(update_id, chat_id)
             if len(result) == 0:
-                return
+                return update_id
             next_message = result[0]
             gender = next_message["message"]["text"].strip().lower()
         
@@ -77,7 +80,7 @@ class TelegramBot:
             self.responder(speeches.register_speech['phone'], chat_id)
             result, update_id = self.get_next_message_result(update_id, chat_id)
             if len(result) == 0:
-                return
+                return update_id
             next_message = result[0]
             phone_number = next_message["message"]["text"].strip()
 
@@ -97,7 +100,7 @@ class TelegramBot:
         self.responder(greetings_text, chat_id)
         result, update_id = self.get_next_message_result(update_id, chat_id)
         if len(result) == 0:
-            return
+            return update_id
         next_message = result[0]
         option = next_message["message"]["text"]
         
@@ -109,11 +112,11 @@ class TelegramBot:
         }
 
         if option == "1":
-            self.make_appointment_flux(update_id, chat_id, user_infos)
+            update_id = self.make_appointment_flux(update_id, chat_id, user_infos)
         elif option == "2":
-            self.cancel_appointment_flux(update_id, chat_id, user_infos)
+            update_id = self.cancel_appointment_flux(update_id, chat_id, user_infos)
         elif option == "3":
-            self.check_appointment_flux(update_id, chat_id, user_infos)
+            update_id = self.check_appointment_flux(update_id, chat_id, user_infos)
         elif option == "4":
             self.responder(speeches.users_speech['acs_notified'], chat_id)
             # TODO notify ACS someway
@@ -122,6 +125,8 @@ class TelegramBot:
             self.responder(speeches.users_speech['end'], chat_id)
         else:
             self.responder(speeches.users_speech['invalid'], chat_id)
+        
+        return update_id
     
     def make_appointment_flux(self, update_id: int, chat_id: str, user_infos: dict):
         """
@@ -169,7 +174,7 @@ class TelegramBot:
         self.responder(speeches.appointment_speech['user_confirmation'].format(chosen_specialty, ubs_name, chosen_date), chat_id)
         result, update_id = self.get_next_message_result(update_id, chat_id)
         if len(result) == 0:
-            return
+            return update_id
         next_message = result[0]
         confirmation = next_message["message"]["text"].strip().lower()
         repeat = True
@@ -195,6 +200,8 @@ class TelegramBot:
             self.responder(speeches.appointment_speech['apointment_ending'], chat_id)
             # TODO if the ACS confirms or not the appointment, we need to user speech in
             # appointment_speech['acs_confirmation'] or appointment_speech['acs_denial']
+        
+        return update_id
 
     def cancel_appointment_flux(self, update_id: int, chat_id: str, user_infos: dict):
         """
@@ -211,7 +218,7 @@ class TelegramBot:
         while(not found):
             result, update_id = self.get_next_message_result(update_id, chat_id)
             if len(result) == 0:
-                return
+                return update_id
             next_message = result[0]
             appointment_number = next_message["message"]["text"]
             if appointment_number.isnumeric():
@@ -233,7 +240,7 @@ class TelegramBot:
         ), chat_id)
         result, update_id = self.get_next_message_result(update_id, chat_id)
         if len(result) == 0:
-            return
+            return update_id
         next_message = result[0]
         confirmation = next_message["message"]["text"].strip().lower()
         repeat = True
@@ -254,6 +261,8 @@ class TelegramBot:
                 DbFunctions.cancel_unconfirmed_appointment(user_infos)
             
             self.responder(speeches.cancel_speech["acs_notified"], chat_id)
+        
+        return update_id
 
     def check_appointment_flux(self, update_id: int, chat_id: str, user_infos: dict):
         """
@@ -280,6 +289,8 @@ class TelegramBot:
             pending_output += (str(index) + " - " + str(item["specialty"]) + " - " + str(item["date_hour"]) + "\n")
 
         self.responder(pending_output, chat_id)
+
+        return update_id
         
     def get_next_message_result(self, update_id: int, chat_id: str):
         """
