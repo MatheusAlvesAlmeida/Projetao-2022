@@ -1,19 +1,39 @@
 # ChatBot
 
-## Install
+## Installing dependencies
 
-### (Optional) Create a Conda Environment
+To install all the libraries needed, just run
+```
+pip install -r requirements.txt
+```
 
-If you have Conda installed, we highly recommend you to create a new environment for usage, to avoid any library conflicts.
-To do so, just run `conda create --name UBSbot python=3.9` and finish the environment creation.
-About the Python version, there's no recommended version, the 3.9 it's just an example.
-After creating the environment, run `conda activate UBSbot` to start the environment.
+## Environment variables
 
-### Installing dependencies
+### At this moment, we use one important environment variable:
 
-To install all the libraries needed, just run `pip install -r requirements.txt`
+```
+TELEGRAM_TOKEN
+```
+This token is needed to run the bot properly. Ask a team member for it.
+
+### Optional params:
+
+```
+MESSAGE_TIMEOUT=120
+
+UBS_NAME=Mandacaru
+```
+
+These are not needed to run the bot properly, but it's good to have them set. The given values are recommended.
 
 ## Running Bot
 
-To run the bot: `python main.py`
-The bot stops after 100 seconds
+To run the bot:
+```
+python main.py
+```
+## Interacting with bot
+
+The bot can found in this telegram link:
+
+`t.me/UbinhoBot`
