@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "projetao-ubs": {
+      "hosting": {
+        "frontend-acs": [
+          "projetao-ubs"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "projetao-ubs"
+  }
+}
