@@ -1,15 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { SuggestionDates } from '../../types/suggestion-dates';
 
-export interface suggestionDates {
-  name: string;
-  id: number;
-  service: string;
-  sus: string;
-  queuePosition: number;
-  appointment: string;
-}
 
-const ELEMENT_DATA: suggestionDates[] = [
+const ELEMENT_DATA: SuggestionDates[] = [
   {
     id: 1,
     name: 'Gabriel',
@@ -34,13 +27,13 @@ const ELEMENT_DATA: suggestionDates[] = [
   styleUrls: ['./home-options.component.css'],
 })
 export class HomeOptionsComponent implements OnInit {
-  constructor() {}
+  constructor() { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   dataSource = [...ELEMENT_DATA];
 
-  confirmAllSuggestions() {}
+  confirmAllSuggestions() { }
 
-  cancelAllSuggestions() {}
+  cancelAllSuggestions() { }
 }
