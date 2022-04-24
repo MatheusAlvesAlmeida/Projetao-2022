@@ -28,6 +28,7 @@
             ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "./node_modulos/angular-calendar/css/angular-calendar.css",
               "src/styles.css"
             ],
             "scripts": []
@@ -99,6 +100,16 @@
               "src/styles.css"
             ],
             "scripts": []
+          }
+        },
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "prerender": false,
+            "ssr": false,
+            "browserTarget": "frontend-acs:build:production",
+            "firebaseProject": "projetao-ubs",
+            "firebaseHostingSite": "projetao-ubs"
           }
         }
       }
