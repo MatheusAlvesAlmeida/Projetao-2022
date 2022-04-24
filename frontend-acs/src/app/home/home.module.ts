@@ -11,18 +11,21 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { FormsModule } from '@angular/forms';
 import { FlatpickrModule } from 'angularx-flatpickr';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 import { AcsDataComponent } from './components/acs-data/acs-data.component';
 import { HomePageComponent } from './pages/home-page.component';
 import { HomeOptionsComponent } from './components/home-options/home-options.component';
 import { CalendarComponent } from './components/calendar/calendar.component';
+import { WeekCalendarComponent } from './components/week-calendar/week-calendar.component';
 
 @NgModule({
   declarations: [
     AcsDataComponent,
     HomePageComponent,
     HomeOptionsComponent,
-    CalendarComponent
+    CalendarComponent,
+    WeekCalendarComponent
   ],
   imports: [
     CommonModule,
@@ -35,6 +38,7 @@ import { CalendarComponent } from './components/calendar/calendar.component';
     NgbModalModule,
     FlatpickrModule.forRoot(),
     MatButtonModule,
+    MatExpansionModule,
     CalendarModule.forRoot({
       provide: DateAdapter,
       useFactory: adapterFactory,
