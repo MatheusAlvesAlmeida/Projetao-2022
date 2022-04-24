@@ -3,5 +3,5 @@ export interface CalendarData {
     service: string;
     sus: string;
     queuePosition: number;
-    date: string;
+    date: any;
 }

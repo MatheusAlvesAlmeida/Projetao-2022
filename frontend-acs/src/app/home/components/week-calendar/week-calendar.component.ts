@@ -7,7 +7,7 @@ const ELEMENT_DATA: CalendarData[] = [
     service: 'Médico',
     sus: '123465',
     queuePosition: 1,
-    date: '24/04/2022',
+    date: new Date("2000-12-17T03:24:00"),
   },
   {
     username: 'Matheus',
