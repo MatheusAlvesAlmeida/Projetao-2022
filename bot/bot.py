@@ -12,6 +12,10 @@ import speeches
 class TelegramBot:
     def __init__(self):
         print("Starting bot...")
+        print("token: ", telegram_token)
+        print("UBS name: ", ubs_name)
+        print("message timeout: ", message_timeout)
+
         self.url_base = f'https://api.telegram.org/bot{telegram_token}/'
         self.user_repo = user_repository()
         self.current_user_queue = []
