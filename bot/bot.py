@@ -11,6 +11,7 @@ import speeches
 
 class TelegramBot:
     def __init__(self):
+        print("Starting bot...")
         self.url_base = f'https://api.telegram.org/bot{telegram_token}/'
         self.user_repo = user_repository()
         self.current_user_queue = []
@@ -18,6 +19,7 @@ class TelegramBot:
         self.sleep_time = 3
 
     def start(self):
+        print("Started!")
         while(True):
             result = []
             while len(result) == 0:
@@ -34,6 +36,7 @@ class TelegramBot:
                     chat_id = next_message_result[0]["message"]["chat"]["id"]
                     if chat_id not in self.current_user_queue:
                         self.current_user_queue.append(chat_id)
+                        print("Queuing user with the following chat_id:", chat_id)
                 else:
                     # Sleeps for some seconds before checking again
                     time.sleep(self.sleep_time)
@@ -310,6 +313,8 @@ class TelegramBot:
             self.responder(speeches.wait_speech, message_chat_id)
             if message_chat_id not in self.current_user_queue:
                 self.current_user_queue.append(message_chat_id)
+                print("Queuing user with the following chat_id:", message_chat_id)
+
 
             update_id += 1
             link_requisicao = f'{self.url_base}getUpdates?timeout={message_timeout}&offset={update_id}'
