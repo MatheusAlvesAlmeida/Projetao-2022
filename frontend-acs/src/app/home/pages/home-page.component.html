@@ -20,6 +20,14 @@
             <mat-icon class="example-tab-icon">calendar_today</mat-icon>
             Calendário
         </ng-template>
-        Vazio ainda
+        <app-calendar></app-calendar>
+    </mat-tab>
+
+    <mat-tab>
+        <ng-template mat-tab-label>
+            <mat-icon class="example-tab-icon">calendar_today</mat-icon>
+            Calendário em lista
+        </ng-template>
+        <app-week-calendar></app-week-calendar>
     </mat-tab>
 </mat-tab-group>

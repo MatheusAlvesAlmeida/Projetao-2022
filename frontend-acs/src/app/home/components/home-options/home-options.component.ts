@@ -1,43 +1,39 @@
 import { Component, OnInit } from '@angular/core';
-import { ViewChild } from '@angular/core';
-import { MatTable } from '@angular/material/table';
-import { MatDialog } from '@angular/material/dialog';
+import { SuggestionDates } from '../../types/suggestion-dates';
 
-export interface suggestionDates {
-  name: string;
-  id: number;
-  service: string;
-  timestamp: string;
-}
 
-const ELEMENT_DATA: suggestionDates[] = [
-  { id: 1, name: 'Gabriel', service: "Urologista", timestamp: '09:00 - 05/05/2022' },
-  { id: 2, name: 'Pietro', service: "Dentista", timestamp: '09:00 - 04/05/2022' },
+const ELEMENT_DATA: SuggestionDates[] = [
+  {
+    id: 1,
+    name: 'Gabriel',
+    service: 'Médico',
+    sus: '123456789',
+    queuePosition: 1,
+    appointment: '09:00 - 04/05/2022',
+  },
+  {
+    id: 2,
+    name: 'Pietro',
+    service: 'Dentista',
+    sus: '123456789',
+    queuePosition: 2,
+    appointment: '09:30 - 04/05/2022',
+  },
 ];
 
 @Component({
   selector: 'app-home-options',
   templateUrl: './home-options.component.html',
-  styleUrls: ['./home-options.component.css']
+  styleUrls: ['./home-options.component.css'],
 })
-
 export class HomeOptionsComponent implements OnInit {
-
   constructor() { }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
 
-
-  displayedColumns: string[] = ['name', 'service', 'timestamp', 'actions'];
-  columnsToDisplay: string[] = this.displayedColumns.slice();
   dataSource = [...ELEMENT_DATA];
 
-  confirmAllSuggestions() {
+  confirmAllSuggestions() { }
 
-  }
-
-  cancelAllSuggestions() {
-  }
-
+  cancelAllSuggestions() { }
 }

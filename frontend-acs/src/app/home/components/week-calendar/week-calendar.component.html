@@ -1,0 +1,63 @@
+<mat-accordion>
+    <mat-card>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Lista para o atendimento do tipo médico
+                </mat-panel-title>
+                <mat-panel-description>
+                    Clique para expandir
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <p *ngFor="let item of dataSource">
+                <mat-card *ngIf="item.service == 'Médico'">
+                    <li>Nome do paciente: {{item.username}}</li>
+                    <li>Data do atendimento: {{item.date}}</li>
+                    <li>SUS: {{item.sus}}</li>
+                    <li>Tipo de atendimento: {{item.service}}</li>
+                </mat-card>
+            </p>
+
+        </mat-expansion-panel>
+    </mat-card>
+    <mat-card>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Lista para o atendimento do tipo enfermaria geral
+                </mat-panel-title>
+                <mat-panel-description>
+                    Clique para expandir
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <p *ngFor="let item of dataSource">
+                <mat-card *ngIf="item.service == 'Enfermaria'">
+                    <li>Nome do paciente: {{item.username}}</li>
+                    <li>Data do atendimento: {{item.date}}</li>
+                    <li>SUS: {{item.sus}}</li>
+                    <li>Tipo de atendimento: {{item.service}}</li>
+                </mat-card>
+            </p>
+        </mat-expansion-panel>
+    </mat-card>
+    <mat-card>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Lista para o atendimento do tipo dentista
+                </mat-panel-title>
+                <mat-panel-description>
+                    Clique para expandir
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <p *ngFor="let item of dataSource">
+                <mat-card *ngIf="item.service == 'Dentista'">
+                    <li>Nome do paciente: {{item.username}}</li>
+                    <li>Data do atendimento: {{item.date}}</li>
+                    <li>SUS: {{item.sus}}</li>
+                    <li>Tipo de atendimento: {{item.service}}</li>
+                </mat-card>
+            </p>
+        </mat-expansion-panel>
+    </mat-card>
+</mat-accordion>
