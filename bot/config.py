@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-is_production = bool(os.getenv("IS_PRODUCTION", True))
+is_production = os.getenv("IS_PRODUCTION", "True") == "True"
 
 telegram_token = os.getenv("TELEGRAM_TOKEN")
 
