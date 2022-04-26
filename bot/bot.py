@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import requests
 import json
 import time
+import re
 
 from config import get_telegram_token, ubs_name, message_timeout
 from user_repository import user_repository
@@ -87,14 +88,57 @@ class TelegramBot:
             else:
                 gender = "OUTRO"
             
+            #CPF
+            self.responder(speeches.register_speech['CPF'], chat_id)
+            result, update_id = self.get_next_message_result(update_id, chat_id)
+            if len(result) == 0:
+                return update_id
+            next_message = result[0]
+            cpf = next_message["message"]["text"]
+            cpf =  re.sub('[^0-9]','', cpf)
+            #RG
+            self.responder(speeches.register_speech['RG'], chat_id)
+            result, update_id = self.get_next_message_result(update_id, chat_id)
+            if len(result) == 0:
+                return update_id
+            next_message = result[0]
+            rg = next_message["message"]["text"]
+            rg =  re.sub('[^0-9]','', rg)
+            #DATA_N
+            self.responder(speeches.register_speech['birth'], chat_id)
+            result, update_id = self.get_next_message_result(update_id, chat_id)
+            if len(result) == 0:
+                return update_id
+            next_message = result[0]
+            birth = next_message["message"]["text"]
+            #CEP
+            self.responder(speeches.register_speech['address_cep'], chat_id)
+            result, update_id = self.get_next_message_result(update_id, chat_id)
+            if len(result) == 0:
+                return update_id
+            next_message = result[0]
+            cep = next_message["message"]["text"]
+            cep =  re.sub('[^0-9]','', cep)
+            #Numero
+            self.responder(speeches.register_speech['address_street_number'], chat_id)
+            result, update_id = self.get_next_message_result(update_id, chat_id)
+            if len(result) == 0:
+                return update_id
+            next_message = result[0]
+            street_number = next_message["message"]["text"]
+            street_number =  re.sub('[^0-9]','', street_number)
+            #END
             self.responder(speeches.register_speech['phone'], chat_id)
             result, update_id = self.get_next_message_result(update_id, chat_id)
             if len(result) == 0:
                 return update_id
             next_message = result[0]
-            phone_number = next_message["message"]["text"].strip()
+            phone_number = next_message["message"]["text"]
+            phone_number = re.sub('[^0-9]','', phone_number)
 
-            result = self.user_repo.register_new_user(cadastro_sus, name, gender, phone_number) # TODO call DB and register this
+
+            result = self.user_repo.register_new_user(cadastro_sus, name, gender, phone_number, cpf, rg, birth, cep, street_number) # TODO call DB and register this
+            (cadastro_sus, name, gender, phone_number, cpf, rg, birth, cep, street_number)
             if result:
                 self.responder(speeches.register_speech['success'], chat_id)
             else:
@@ -105,6 +149,11 @@ class TelegramBot:
         name = user["name"]
         gender = user["gender"]
         phone_number = user["phone_number"]
+        cpf = user["cpf"]
+        rg = user["rg"]
+        birth = user["birth"]
+        cep = user["cep"]
+        street_number = user["street_number"]
 
         greetings_text = speeches.users_speech['hello'].format(name)
         self.responder(greetings_text, chat_id)
@@ -118,7 +167,12 @@ class TelegramBot:
             "cadastro_sus": cadastro_sus,
             "name": name,
             "gender": gender,
-            "phone_number": phone_number
+            "phone_number": phone_number,
+            "cpf": cpf,
+            "rg": rg,
+            "birth": birth,
+            "cep": cep,
+            "stret_number": street_number
         }
 
         if option == "1":

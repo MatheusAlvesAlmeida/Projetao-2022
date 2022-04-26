@@ -12,12 +12,17 @@ class user_repository():
         return exists
 
     def register_new_user(self,
-        cadastro_sus: str, name: str, gender: str, telephone_number: str
+        cadastro_sus: str, name: str, gender: str, telephone_number: str, cpf: str, rg: str, birth: str, cep: str, street_number: str
     ):
         self.user_repository[cadastro_sus] = {
             "name": name,
             "gender": gender,
-            "phone_number": telephone_number
+            "phone_number": telephone_number,
+            "cpf": cpf,
+            "rg": rg,
+            "birth": birth,
+            "cep": cep,
+            "street_number": street_number
         }
         return True
 
