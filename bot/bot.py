@@ -316,6 +316,10 @@ class TelegramBot:
 
         message_chat_id = result[0]["message"]["chat"]["id"]
 
+        if "text" not in result[0]["message"]:
+            self.responder(speeches.no_text_speech, message_chat_id)
+            return [], update_id # message without text
+
         while message_chat_id != chat_id:
             self.responder(speeches.wait_speech, message_chat_id)
             if message_chat_id not in self.current_user_queue:
@@ -328,6 +332,10 @@ class TelegramBot:
             result = json.loads(requests.get(link_requisicao).content)["result"]
             if len(result) == 0:
                 return result, update_id # timeout
+            
+            if "text" not in result[0]["message"]:
+                self.responder(speeches.no_text_speech, message_chat_id)
+                return [], update_id # message without text
 
             message_chat_id = result[0]["message"]["chat"]["id"]
             

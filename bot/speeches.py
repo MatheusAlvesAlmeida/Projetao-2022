@@ -13,6 +13,9 @@ greetings_speech = "Olá! Eu sou o atendente virtual da UBS {}! Para poder te at
 # Asking user to wait
 wait_speech = "Estou muito ocupado nesse momento! Aguarde alguns minutos!"
 
+# Asking user to send only messages with text
+no_text_speech = "No momento, eu só consigo entender texto! Tente enviar uma mensagem contendo palavras da próxima vez!"
+
 #Registering a new user
 register_speech['hello'] = "Parece que é a primeira vez que você usa os serviços do atendente virtual, então vamos precisar fazer um rápido cadastro para que eu possa te conhecer melhor! Primeiro, qual o seu nome completo?"
 register_speech['gender'] = "Qual o seu sexo? \n1) Masculino.\n2) Feminino."
