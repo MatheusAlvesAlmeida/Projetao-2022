@@ -18,5 +18,7 @@ def get_telegram_token():
     returns the correct token prod or dev token
     """
     if is_production:
+        print("Bot starting in production.")
         return telegram_token
+    print("Bot starting in development.")
     return telegram_token_dev
