@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-telegram_token = os.getenv("TELEGRAM_TOKEN")
+telegram_token = os.getenv("TELEGRAM_TOKEN_DEV")
 
 message_timeout = os.getenv("MESSAGE_TIMEOUT")
 

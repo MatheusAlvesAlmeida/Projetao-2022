@@ -1,3 +1,6 @@
+from sympy import re
+
+
 register_speech = dict()
 users_speech = dict()
 appointment_speech = dict()
@@ -14,8 +17,15 @@ greetings_speech = "Olá! Eu sou o atendente virtual da UBS {}! Para poder te at
 wait_speech = "Estou muito ocupado nesse momento! Aguarde alguns minutos!"
 
 #Registering a new user
+            #nome, cpf, rg, sus, data n, end, tel
+
 register_speech['hello'] = "Parece que é a primeira vez que você usa os serviços do atendente virtual, então vamos precisar fazer um rápido cadastro para que eu possa te conhecer melhor! Primeiro, qual o seu nome completo?"
 register_speech['gender'] = "Qual o seu sexo? \n1) Masculino.\n2) Feminino."
+register_speech['CPF'] = "Digite o seu CPF"
+register_speech['RG'] = "Digite o seu RG"
+register_speech['birth'] = "Digite a sua data de nascimento dd/mm/aa"
+register_speech['address_cep'] = "Qual o seu cep?"
+register_speech['address_street_number'] = "Agora digite o número de sua residência"
 register_speech['phone'] = "Qual o seu telefone para contato?"
 register_speech['success'] = "Pronto, seu cadastro foi realizado para os serviços do atendente virtual!"
 register_speech['failure'] = "Infelizmente não foi possível realizar o seu cadastro nesse momento. Tente novamente mais tarde."
