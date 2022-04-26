@@ -4,7 +4,7 @@ import json
 import time
 import re
 
-from config import telegram_token, ubs_name, message_timeout
+from config import get_telegram_token, ubs_name, message_timeout
 from user_repository import user_repository
 from acs_inteface import AcsFunctions
 from db_interface import DbFunctions
@@ -12,13 +12,21 @@ import speeches
 
 class TelegramBot:
     def __init__(self):
-        self.url_base = f'https://api.telegram.org/bot{telegram_token}/'
+        self.token = get_telegram_token()
+
+        print("Starting bot...")
+        print("token: ", self.token)
+        print("UBS name: ", ubs_name)
+        print("message timeout: ", message_timeout)
+
+        self.url_base = f'https://api.telegram.org/bot{self.token}/'
         self.user_repo = user_repository()
         self.current_user_queue = []
         self.specialty_repo = ["Odontologia", "Pediatria", "Oftalmologia", "Urologia", "Ginecologia"]
         self.sleep_time = 3
 
     def start(self):
+        print("Started!")
         while(True):
             result = []
             while len(result) == 0:
@@ -35,11 +43,13 @@ class TelegramBot:
                     chat_id = next_message_result[0]["message"]["chat"]["id"]
                     if chat_id not in self.current_user_queue:
                         self.current_user_queue.append(chat_id)
+                        print("Queuing user with the following chat_id:", chat_id)
                 else:
                     # Sleeps for some seconds before checking again
                     time.sleep(self.sleep_time)
 
                 while len(self.current_user_queue) > 0:
+                    print("")
                     update_id = self.general_flux(update_id, self.current_user_queue.pop(0))
 
 
@@ -360,16 +370,26 @@ class TelegramBot:
 
         message_chat_id = result[0]["message"]["chat"]["id"]
 
+        if "text" not in result[0]["message"]:
+            self.responder(speeches.no_text_speech, message_chat_id)
+            return [], update_id # message without text
+
         while message_chat_id != chat_id:
             self.responder(speeches.wait_speech, message_chat_id)
             if message_chat_id not in self.current_user_queue:
                 self.current_user_queue.append(message_chat_id)
+                print("Queuing user with the following chat_id:", message_chat_id)
+
 
             update_id += 1
             link_requisicao = f'{self.url_base}getUpdates?timeout={message_timeout}&offset={update_id}'
             result = json.loads(requests.get(link_requisicao).content)["result"]
             if len(result) == 0:
                 return result, update_id # timeout
+            
+            if "text" not in result[0]["message"]:
+                self.responder(speeches.no_text_speech, message_chat_id)
+                return [], update_id # message without text
 
             message_chat_id = result[0]["message"]["chat"]["id"]
             
