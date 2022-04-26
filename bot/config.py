@@ -3,8 +3,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+is_production = bool(os.getenv("IS_PRODUCTION", True))
+
 telegram_token = os.getenv("TELEGRAM_TOKEN")
 
-message_timeout = os.getenv("MESSAGE_TIMEOUT")
+telegram_token_dev = os.getenv("TELEGRAM_TOKEN_DEV")
+
+message_timeout = os.getenv("MESSAGE_TIMEOUT", 120)
 
 ubs_name = os.getenv("UBS_NAME")
+
+def get_telegram_token():
+    """
+    returns the correct token prod or dev token
+    """
+    if is_production:
+        return telegram_token
+    return telegram_token_dev
