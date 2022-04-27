@@ -21,7 +21,6 @@ class TelegramBot:
 
         self.url_base = f'https://api.telegram.org/bot{self.token}/'
         self.user_repo = user_repository()
-        self.current_user_queue = []
         self.specialty_repo = ["Odontologia", "Pediatria", "Oftalmologia", "Urologia", "Ginecologia"]
         self.sleep_time = 3
 
@@ -36,22 +35,13 @@ class TelegramBot:
 
             update_id = int(result[-1]["update_id"])
             chat_id = result[-1]["message"]["chat"]["id"]
+            message_unix_date = result[-1]["message"]["date"]
+            now_unix_date = int(time.time())
 
-            while (True):    
-                next_message_result, update_id = self.get_next_message_result(update_id, chat_id)
-                if len(next_message_result) > 0:
-                    chat_id = next_message_result[0]["message"]["chat"]["id"]
-                    if chat_id not in self.current_user_queue:
-                        self.current_user_queue.append(chat_id)
-                        print("Queuing user with the following chat_id:", chat_id)
-                else:
-                    # Sleeps for some seconds before checking again
-                    time.sleep(self.sleep_time)
-
-                while len(self.current_user_queue) > 0:
-                    print("")
-                    update_id = self.general_flux(update_id, self.current_user_queue.pop(0))
-
+            if (now_unix_date - message_unix_date) <= (self.sleep_time * 2):
+                print("Serving user with chat_id:", chat_id)
+                update_id = self.general_flux(update_id, chat_id)
+                time.sleep(self.sleep_time)
 
     def general_flux(self, update_id: int, chat_id: str):
         self.responder(speeches.greetings_speech.format(ubs_name), chat_id)
@@ -359,13 +349,14 @@ class TelegramBot:
     def get_next_message_result(self, update_id: int, chat_id: str):
         """
         get the next message the of a given chat.
-        In case of the next message being from another user, put it on the queue, and wait again for
+        In case of the next message being from another user, ask for them to try again in a few minutes, and wait again for
         expected one.
         """
         update_id += 1
         link_requisicao = f'{self.url_base}getUpdates?timeout={message_timeout}&offset={update_id}'
         result = json.loads(requests.get(link_requisicao).content)["result"]
         if len(result) == 0:
+            update_id -= 1
             return result, update_id # timeout
 
         message_chat_id = result[0]["message"]["chat"]["id"]
@@ -376,23 +367,21 @@ class TelegramBot:
 
         while message_chat_id != chat_id:
             self.responder(speeches.wait_speech, message_chat_id)
-            if message_chat_id not in self.current_user_queue:
-                self.current_user_queue.append(message_chat_id)
-                print("Queuing user with the following chat_id:", message_chat_id)
-
 
             update_id += 1
             link_requisicao = f'{self.url_base}getUpdates?timeout={message_timeout}&offset={update_id}'
+
             result = json.loads(requests.get(link_requisicao).content)["result"]
             if len(result) == 0:
+                update_id -= 1
                 return result, update_id # timeout
             
+            message_chat_id = result[0]["message"]["chat"]["id"]
+
             if "text" not in result[0]["message"]:
                 self.responder(speeches.no_text_speech, message_chat_id)
                 return [], update_id # message without text
 
-            message_chat_id = result[0]["message"]["chat"]["id"]
-            
         return result, update_id
 
     def get_last_update_result(self):
