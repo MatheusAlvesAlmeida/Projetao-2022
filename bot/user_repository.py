@@ -4,7 +4,12 @@ class user_repository():
         self.user_repository["123456"] = {
             "name": "André Luiz",
             "gender": "MASCULINO",
-            "phone_number": "2345678"
+            "phone_number": "2345678",
+            "cpf": "12301002099",
+            "rg": "3919903",
+            "birth": "16/07/1998",
+            "cep": "53010330",
+            "street_number": "298"
         }
 
     def check_if_user_exists(self, cadastro_sus):
@@ -12,12 +17,17 @@ class user_repository():
         return exists
 
     def register_new_user(self,
-        cadastro_sus: str, name: str, gender: str, telephone_number: str
+        cadastro_sus: str, name: str, gender: str, telephone_number: str, cpf: str, rg: str, birth: str, cep: str, street_number: str
     ):
         self.user_repository[cadastro_sus] = {
             "name": name,
             "gender": gender,
-            "phone_number": telephone_number
+            "phone_number": telephone_number,
+            "cpf": cpf,
+            "rg": rg,
+            "birth": birth,
+            "cep": cep,
+            "street_number": street_number
         }
         return True
 
