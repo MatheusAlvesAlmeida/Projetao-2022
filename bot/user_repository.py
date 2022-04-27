@@ -4,7 +4,12 @@ class user_repository():
         self.user_repository["123456"] = {
             "name": "André Luiz",
             "gender": "MASCULINO",
-            "phone_number": "2345678"
+            "phone_number": "2345678",
+            "cpf": "12301002099",
+            "rg": "3919903",
+            "birth": "16/07/1998",
+            "cep": "53010330",
+            "street_number": "298"
         }
 
     def check_if_user_exists(self, cadastro_sus):
