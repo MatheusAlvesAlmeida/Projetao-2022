@@ -5,8 +5,6 @@ import time
 import re
 
 from config import get_telegram_token, ubs_name, message_timeout
-from user_repository import user_repository
-from acs_inteface import AcsFunctions
 from db_interface import DbFunctions
 import speeches
 
@@ -20,9 +18,10 @@ class TelegramBot:
         print("message timeout: ", message_timeout)
 
         self.url_base = f'https://api.telegram.org/bot{self.token}/'
-        self.user_repo = user_repository()
         self.specialty_repo = ["Odontologia", "Pediatria", "Oftalmologia", "Urologia", "Ginecologia"]
         self.sleep_time = 3
+
+        self.db = DbFunctions()
 
     def start(self):
         print("Started!")
@@ -50,33 +49,35 @@ class TelegramBot:
             return update_id
         next_message = result[0]
         cadastro_sus = next_message["message"]["text"]
-
-        already_registered = self.user_repo.check_if_user_exists(cadastro_sus) # TODO check against DB
+        user = self.db.get_user(cadastro_sus)
     
-        if (not already_registered):
+        if (len(user) == 0):
             # Register new user
+
+            user["cadastro_sus"] = cadastro_sus
+
             self.responder(speeches.register_speech['hello'], chat_id)
             result, update_id = self.get_next_message_result(update_id, chat_id)
             if len(result) == 0:
                 return update_id
             next_message = result[0]
-            name = next_message["message"]["text"]
+            user["name"] = next_message["message"]["text"]
             
             self.responder(speeches.register_speech['gender'], chat_id)
             result, update_id = self.get_next_message_result(update_id, chat_id)
             if len(result) == 0:
                 return update_id
             next_message = result[0]
-            gender = next_message["message"]["text"].strip().lower()
+            user["gender"] = next_message["message"]["text"].strip().lower()
         
-            if (gender == "1" or gender == "masculino"):
-                gender = "MASCULINO"
-            elif (gender == "2" or gender == "feminino"):
-                gender = "FEMININO"
-            elif (gender == "3" or gender == "prefiro nao informar"):
-                gender = "NAO INFORMADO"
+            if (user["gender"] == "1" or user["gender"] == "masculino"):
+                user["gender"] = "MASCULINO"
+            elif (user["gender"] == "2" or user["gender"] == "feminino"):
+                user["gender"] = "FEMININO"
+            elif (user["gender"] == "3" or user["gender"] == "prefiro nao informar"):
+                user["gender"] = "NAO INFORMADO"
             else:
-                gender = "OUTRO"
+                user["gender"] = "OUTRO"
             
             #CPF
             self.responder(speeches.register_speech['CPF'], chat_id)
@@ -85,7 +86,7 @@ class TelegramBot:
                 return update_id
             next_message = result[0]
             cpf = next_message["message"]["text"]
-            cpf =  re.sub('[^0-9]','', cpf)
+            user["CPF"] = re.sub('[^0-9]','', cpf)
             #RG
             self.responder(speeches.register_speech['RG'], chat_id)
             result, update_id = self.get_next_message_result(update_id, chat_id)
@@ -93,14 +94,14 @@ class TelegramBot:
                 return update_id
             next_message = result[0]
             rg = next_message["message"]["text"]
-            rg =  re.sub('[^0-9]','', rg)
+            user["RG"] = re.sub('[^0-9]','', rg)
             #DATA_N
             self.responder(speeches.register_speech['birth'], chat_id)
             result, update_id = self.get_next_message_result(update_id, chat_id)
             if len(result) == 0:
                 return update_id
             next_message = result[0]
-            birth = next_message["message"]["text"]
+            user["birth"] = next_message["message"]["text"]
             #CEP
             self.responder(speeches.register_speech['address_cep'], chat_id)
             result, update_id = self.get_next_message_result(update_id, chat_id)
@@ -108,7 +109,7 @@ class TelegramBot:
                 return update_id
             next_message = result[0]
             cep = next_message["message"]["text"]
-            cep =  re.sub('[^0-9]','', cep)
+            user["CEP"] = re.sub('[^0-9]','', cep)
             #Numero
             self.responder(speeches.register_speech['address_street_number'], chat_id)
             result, update_id = self.get_next_message_result(update_id, chat_id)
@@ -116,7 +117,7 @@ class TelegramBot:
                 return update_id
             next_message = result[0]
             street_number = next_message["message"]["text"]
-            street_number =  re.sub('[^0-9]','', street_number)
+            user["address_number"] = re.sub('[^0-9]','', street_number)
             #END
             self.responder(speeches.register_speech['phone'], chat_id)
             result, update_id = self.get_next_message_result(update_id, chat_id)
@@ -124,28 +125,19 @@ class TelegramBot:
                 return update_id
             next_message = result[0]
             phone_number = next_message["message"]["text"]
-            phone_number = re.sub('[^0-9]','', phone_number)
+            user["phone_number"] = re.sub('[^0-9]','', phone_number)
 
+            register_result = self.db.register_user(user)
 
-            result = self.user_repo.register_new_user(cadastro_sus, name, gender, phone_number, cpf, rg, birth, cep, street_number) # TODO call DB and register this
-            (cadastro_sus, name, gender, phone_number, cpf, rg, birth, cep, street_number)
-            if result:
+            if register_result:
                 self.responder(speeches.register_speech['success'], chat_id)
             else:
                 self.responder(speeches.register_speech['failure'], chat_id)
+                return update_id
 
         # Already registered
-        user = self.user_repo.get_user(cadastro_sus) # TODO call DB and get this
-        name = user["name"]
-        gender = user["gender"]
-        phone_number = user["phone_number"]
-        cpf = user["cpf"]
-        rg = user["rg"]
-        birth = user["birth"]
-        cep = user["cep"]
-        street_number = user["street_number"]
 
-        greetings_text = speeches.users_speech['hello'].format(name)
+        greetings_text = speeches.users_speech['hello'].format(user["name"])
         self.responder(greetings_text, chat_id)
         result, update_id = self.get_next_message_result(update_id, chat_id)
         if len(result) == 0:
@@ -154,15 +146,12 @@ class TelegramBot:
         option = next_message["message"]["text"]
         
         user_infos = {
-            "cadastro_sus": cadastro_sus,
-            "name": name,
-            "gender": gender,
-            "phone_number": phone_number,
-            "cpf": cpf,
-            "rg": rg,
-            "birth": birth,
-            "cep": cep,
-            "stret_number": street_number
+            "cadastro_sus": user["cadastro_sus"],
+            "name": user["name"],
+            "gender": user["gender"],
+            "phone_number": user["phone_number"],
+            "cep": user["CPF"],
+            "address_number": user["address_number"]
         }
 
         if option == "1":
@@ -174,7 +163,7 @@ class TelegramBot:
         elif option == "4":
             self.responder(speeches.users_speech['acs_notified'], chat_id)
             # TODO notify ACS someway
-            AcsFunctions.notify_acs_contact(user_infos)
+            # AcsFunctions.notify_acs_contact(user_infos)
         elif option == "5":
             self.responder(speeches.users_speech['end'], chat_id)
         else:
@@ -204,28 +193,8 @@ class TelegramBot:
                     self.responder(speeches.error_speech['invalid_number'], chat_id)
             else:
                 self.responder(speeches.error_speech['only_numbers'], chat_id)
-        
-        self.responder(speeches.appointment_speech['date_time'].format(chosen_specialty), chat_id)
-        dates_string, dates_dict = self.getDatesOptions(chosen_specialty)
-        self.responder(dates_string, chat_id)
-        found = False
-        while(not found):
-            result, update_id = self.get_next_message_result(update_id, chat_id)
-            if len(result) == 0:
-                return
-            next_message = result[0]
-            date_number = next_message["message"]["text"]
-            if date_number.isnumeric():
-                date_number = int(date_number)
-                if date_number in dates_dict:
-                    chosen_date = dates_dict[date_number]
-                    found = True
-                else:
-                    self.responder(speeches.error_speech['invalid_number'], chat_id)
-            else:
-                self.responder(speeches.error_speech['only_numbers'], chat_id)
 
-        self.responder(speeches.appointment_speech['user_confirmation'].format(chosen_specialty, ubs_name, chosen_date), chat_id)
+        self.responder(speeches.appointment_speech['user_confirmation'].format(chosen_specialty, ubs_name), chat_id)
         result, update_id = self.get_next_message_result(update_id, chat_id)
         if len(result) == 0:
             return update_id
@@ -244,13 +213,9 @@ class TelegramBot:
 
         if confirmation:
             user_infos["chosen_specialty"] = chosen_specialty
-            user_infos["chosen_date"] = chosen_date
             user_infos["chat_id"] = chat_id
 
-            # Pass all the collected information (in the user_infos) to the ACS,
-            # including the chat_id, so that when the ACS confirms or not the
-            # appointment, we can send a message to this user
-            AcsFunctions.make_appointment(user_infos)
+            self.db.register_pending_appointment(user_infos)
             self.responder(speeches.appointment_speech['apointment_ending'], chat_id)
             # TODO if the ACS confirms or not the appointment, we need to user speech in
             # appointment_speech['acs_confirmation'] or appointment_speech['acs_denial']
@@ -310,9 +275,10 @@ class TelegramBot:
         
         if confirmation:
             if is_appointment_confirmed:
-                AcsFunctions.cancel_appointment(user_infos)
+                self.db.register_cancel_appointment_order(user_infos)
             else:
-                DbFunctions.cancel_unconfirmed_appointment(user_infos)
+                # TODO check if this feature is really necessary.
+                self.db.cancel_unconfirmed_appointment(user_infos)
             
             self.responder(speeches.cancel_speech["acs_notified"], chat_id)
         
@@ -322,7 +288,7 @@ class TelegramBot:
         """
         """
         confirmed_appointments_list, pending_appointments_list = (
-            DbFunctions.get_next_appointments_from_user(
+            self.db.get_next_appointments_from_user(
                 user_infos["cadastro_sus"]
             )
         )
@@ -331,7 +297,7 @@ class TelegramBot:
         confirmed_output = ""
         for count, item in enumerate(confirmed_appointments_list):
             index = count + 1
-            confirmed_output += (str(index) + " - " + str(item["specialty"]) + " - " + str(item["date_hour"]) + "\n")
+            confirmed_output += (str(index) + " - " + str(item["chosen_specialty"]) + " - " + str(item["date_hour"]) + "\n")
         
         self.responder(confirmed_output, chat_id)
 
@@ -340,7 +306,7 @@ class TelegramBot:
         pending_output = ""
         for count, item in enumerate(pending_appointments_list):
             index = count + 1
-            pending_output += (str(index) + " - " + str(item["specialty"]) + " - " + str(item["date_hour"]) + "\n")
+            pending_output += (str(index) + " - " + str(item["chosen_specialty"]) + "\n")
 
         self.responder(pending_output, chat_id)
 
@@ -410,34 +376,13 @@ class TelegramBot:
         
         return string_output, dict_output
 
-    def getDatesOptions(self, specialty: str):
-        """
-        returns a formatted string containing the next 10 free slots of the chosen specialty offered by the UBS
-        and a dict where each date-time is linked to its position in the list, so that the bot can
-        interpret each option
-        """
-        string_output = ""
-        dict_output = {}
-        # TODO get from DB
-        # free_dates = DbFunctions.get_next_free_slots_for_specialty(specialty)
-        free_dates = []
-        for i in range(10):
-            free_dates.append(datetime.today() + timedelta(days=1))
-
-        for count, item in enumerate(free_dates):
-            index = count + 1
-            string_output += (str(index) + " - " + str(item) + "\n")
-            dict_output[index] = item
-        
-        return string_output, dict_output
-
     def get_all_appointments(self, cadastro_sus: str):
         """
         returns a string informing all appointments of a given cadastro_sus
         and a dict linking the index numbers on the string to each appoitment object.
         """
         confirmed_appointments_list, pending_appointments_list = (
-            DbFunctions.get_next_appointments_from_user(
+            self.db.get_next_appointments_from_user(
                 cadastro_sus
             )
         )
