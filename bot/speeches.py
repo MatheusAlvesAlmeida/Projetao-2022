@@ -44,8 +44,8 @@ users_speech['invalid'] = "Opção inválida."
 appointment_speech['specialty'] = "Para qual especialidade você gostaria de marcar consulta?"
 #<especialidade>
 appointment_speech['date_time'] = "Esses são os próximos 10 horários disponíveis para {}. Escolha o que mais lhe agrada:"
-#<especialidade>, <nome ubs>, <horário escolhido>
-appointment_speech['user_confirmation'] = "Você confirma que deseja marcar uma consulta para {}, na UBS {}, no seguinte horário: {}? \n1) Sim. \n2) Não."
+#<especialidade>, <nome ubs>
+appointment_speech['user_confirmation'] = "Você confirma que deseja marcar uma consulta para {}, na UBS {}? \n1) Sim. \n2) Não."
 appointment_speech['apointment_ending'] = "Seu pedido de agendamento de consulta foi encaminhado para o ACS responsável. Assim que ele processar seu pedido, eu te avisarei!"
 #<link do calendar>
 appointment_speech['acs_confirmation'] = "O ACS responsável confirmou o seu agendamento. Fique atento para a data e caso não seja possível comparecer no dia, solicite um cancelamento e depois agende novamente! Use esse link para adicionar a consulta como evento ao seu calendário: {}"
