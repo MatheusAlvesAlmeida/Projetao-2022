@@ -75,7 +75,7 @@ class DbFunctions:
             .limit_to_first(10)
             .get()
         )
-        print(response)
+
         if (response.val() is not None):
             for appointment in response.each():
                 confirmed_appointments_list.append(appointment.val())
