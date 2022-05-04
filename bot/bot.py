@@ -2,8 +2,9 @@ from datetime import datetime, timedelta
 import requests
 import json
 import time
+import re
 
-from config import telegram_token, ubs_name, message_timeout
+from config import get_telegram_token, ubs_name, message_timeout
 from user_repository import user_repository
 from acs_inteface import AcsFunctions
 from db_interface import DbFunctions
@@ -11,13 +12,20 @@ import speeches
 
 class TelegramBot:
     def __init__(self):
-        self.url_base = f'https://api.telegram.org/bot{telegram_token}/'
+        self.token = get_telegram_token()
+
+        print("Starting bot...")
+        print("token: ", self.token)
+        print("UBS name: ", ubs_name)
+        print("message timeout: ", message_timeout)
+
+        self.url_base = f'https://api.telegram.org/bot{self.token}/'
         self.user_repo = user_repository()
-        self.current_user_queue = []
         self.specialty_repo = ["Odontologia", "Pediatria", "Oftalmologia", "Urologia", "Ginecologia"]
         self.sleep_time = 3
 
     def start(self):
+        print("Started!")
         while(True):
             result = []
             while len(result) == 0:
@@ -27,20 +35,13 @@ class TelegramBot:
 
             update_id = int(result[-1]["update_id"])
             chat_id = result[-1]["message"]["chat"]["id"]
+            message_unix_date = result[-1]["message"]["date"]
+            now_unix_date = int(time.time())
 
-            while (True):    
-                next_message_result, update_id = self.get_next_message_result(update_id, chat_id)
-                if len(next_message_result) > 0:
-                    chat_id = next_message_result[0]["message"]["chat"]["id"]
-                    if chat_id not in self.current_user_queue:
-                        self.current_user_queue.append(chat_id)
-                else:
-                    # Sleeps for some seconds before checking again
-                    time.sleep(self.sleep_time)
-
-                while len(self.current_user_queue) > 0:
-                    update_id = self.general_flux(update_id, self.current_user_queue.pop(0))
-
+            if (now_unix_date - message_unix_date) <= (self.sleep_time * 2):
+                print("Serving user with chat_id:", chat_id)
+                update_id = self.general_flux(update_id, chat_id)
+                time.sleep(self.sleep_time)
 
     def general_flux(self, update_id: int, chat_id: str):
         self.responder(speeches.greetings_speech.format(ubs_name), chat_id)
@@ -77,14 +78,57 @@ class TelegramBot:
             else:
                 gender = "OUTRO"
             
+            #CPF
+            self.responder(speeches.register_speech['CPF'], chat_id)
+            result, update_id = self.get_next_message_result(update_id, chat_id)
+            if len(result) == 0:
+                return update_id
+            next_message = result[0]
+            cpf = next_message["message"]["text"]
+            cpf =  re.sub('[^0-9]','', cpf)
+            #RG
+            self.responder(speeches.register_speech['RG'], chat_id)
+            result, update_id = self.get_next_message_result(update_id, chat_id)
+            if len(result) == 0:
+                return update_id
+            next_message = result[0]
+            rg = next_message["message"]["text"]
+            rg =  re.sub('[^0-9]','', rg)
+            #DATA_N
+            self.responder(speeches.register_speech['birth'], chat_id)
+            result, update_id = self.get_next_message_result(update_id, chat_id)
+            if len(result) == 0:
+                return update_id
+            next_message = result[0]
+            birth = next_message["message"]["text"]
+            #CEP
+            self.responder(speeches.register_speech['address_cep'], chat_id)
+            result, update_id = self.get_next_message_result(update_id, chat_id)
+            if len(result) == 0:
+                return update_id
+            next_message = result[0]
+            cep = next_message["message"]["text"]
+            cep =  re.sub('[^0-9]','', cep)
+            #Numero
+            self.responder(speeches.register_speech['address_street_number'], chat_id)
+            result, update_id = self.get_next_message_result(update_id, chat_id)
+            if len(result) == 0:
+                return update_id
+            next_message = result[0]
+            street_number = next_message["message"]["text"]
+            street_number =  re.sub('[^0-9]','', street_number)
+            #END
             self.responder(speeches.register_speech['phone'], chat_id)
             result, update_id = self.get_next_message_result(update_id, chat_id)
             if len(result) == 0:
                 return update_id
             next_message = result[0]
-            phone_number = next_message["message"]["text"].strip()
+            phone_number = next_message["message"]["text"]
+            phone_number = re.sub('[^0-9]','', phone_number)
 
-            result = self.user_repo.register_new_user(cadastro_sus, name, gender, phone_number) # TODO call DB and register this
+
+            result = self.user_repo.register_new_user(cadastro_sus, name, gender, phone_number, cpf, rg, birth, cep, street_number) # TODO call DB and register this
+            (cadastro_sus, name, gender, phone_number, cpf, rg, birth, cep, street_number)
             if result:
                 self.responder(speeches.register_speech['success'], chat_id)
             else:
@@ -95,6 +139,11 @@ class TelegramBot:
         name = user["name"]
         gender = user["gender"]
         phone_number = user["phone_number"]
+        cpf = user["cpf"]
+        rg = user["rg"]
+        birth = user["birth"]
+        cep = user["cep"]
+        street_number = user["street_number"]
 
         greetings_text = speeches.users_speech['hello'].format(name)
         self.responder(greetings_text, chat_id)
@@ -108,7 +157,12 @@ class TelegramBot:
             "cadastro_sus": cadastro_sus,
             "name": name,
             "gender": gender,
-            "phone_number": phone_number
+            "phone_number": phone_number,
+            "cpf": cpf,
+            "rg": rg,
+            "birth": birth,
+            "cep": cep,
+            "stret_number": street_number
         }
 
         if option == "1":
@@ -295,30 +349,39 @@ class TelegramBot:
     def get_next_message_result(self, update_id: int, chat_id: str):
         """
         get the next message the of a given chat.
-        In case of the next message being from another user, put it on the queue, and wait again for
+        In case of the next message being from another user, ask for them to try again in a few minutes, and wait again for
         expected one.
         """
         update_id += 1
         link_requisicao = f'{self.url_base}getUpdates?timeout={message_timeout}&offset={update_id}'
         result = json.loads(requests.get(link_requisicao).content)["result"]
         if len(result) == 0:
+            update_id -= 1
             return result, update_id # timeout
 
         message_chat_id = result[0]["message"]["chat"]["id"]
 
+        if "text" not in result[0]["message"]:
+            self.responder(speeches.no_text_speech, message_chat_id)
+            return [], update_id # message without text
+
         while message_chat_id != chat_id:
             self.responder(speeches.wait_speech, message_chat_id)
-            if message_chat_id not in self.current_user_queue:
-                self.current_user_queue.append(message_chat_id)
 
             update_id += 1
             link_requisicao = f'{self.url_base}getUpdates?timeout={message_timeout}&offset={update_id}'
+
             result = json.loads(requests.get(link_requisicao).content)["result"]
             if len(result) == 0:
+                update_id -= 1
                 return result, update_id # timeout
-
-            message_chat_id = result[0]["message"]["chat"]["id"]
             
+            message_chat_id = result[0]["message"]["chat"]["id"]
+
+            if "text" not in result[0]["message"]:
+                self.responder(speeches.no_text_speech, message_chat_id)
+                return [], update_id # message without text
+
         return result, update_id
 
     def get_last_update_result(self):

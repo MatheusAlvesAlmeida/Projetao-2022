@@ -6,7 +6,7 @@ const ELEMENT_DATA: SuggestionDates[] = [
   {
     id: 1,
     name: 'Gabriel',
-    service: 'Médico',
+    service: 'Médico clínico geral',
     sus: '123456789',
     queuePosition: 1,
     appointment: '09:00 - 04/05/2022',
