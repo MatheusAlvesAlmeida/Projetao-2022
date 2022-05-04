@@ -4,7 +4,7 @@ import { CalendarData } from '../../types/calendar-data';
 const ELEMENT_DATA: CalendarData[] = [
   {
     username: 'Matheus',
-    service: 'Médico',
+    service: 'Médico clínico geral',
     sus: '123465',
     queuePosition: 1,
     date: new Date("2000-12-17T03:24:00"),
@@ -18,7 +18,7 @@ const ELEMENT_DATA: CalendarData[] = [
   },
   {
     username: 'Pietro',
-    service: 'Médico',
+    service: 'Médico clínico geral',
     sus: '123465',
     queuePosition: 1,
     date: '24/04/2022',
