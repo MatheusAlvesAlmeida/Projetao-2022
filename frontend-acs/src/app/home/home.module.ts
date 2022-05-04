@@ -16,7 +16,6 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { AcsDataComponent } from './components/acs-data/acs-data.component';
 import { HomePageComponent } from './pages/home-page.component';
 import { HomeOptionsComponent } from './components/home-options/home-options.component';
-import { CalendarComponent } from './components/calendar/calendar.component';
 import { WeekCalendarComponent } from './components/week-calendar/week-calendar.component';
 
 @NgModule({
@@ -24,8 +23,7 @@ import { WeekCalendarComponent } from './components/week-calendar/week-calendar.
     AcsDataComponent,
     HomePageComponent,
     HomeOptionsComponent,
-    CalendarComponent,
-    WeekCalendarComponent
+    WeekCalendarComponent,
   ],
   imports: [
     CommonModule,
