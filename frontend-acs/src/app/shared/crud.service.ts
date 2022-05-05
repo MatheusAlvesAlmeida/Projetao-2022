@@ -12,15 +12,14 @@ import {
 
 
 export class CrudService {
-  // TODO: fix this error
-  patientsRef: AngularFireList<any>;
-  patientRef: AngularFireObject<any>;
+  patientsRef: AngularFireList<any> | undefined;
+  patientRef: AngularFireObject<any> | undefined;
 
   constructor(private db: AngularFireDatabase) {}
 
   // Create Confirmed Patients List
   addConfirmedQueue(confirmedPatients: ConfirmedPatients) {
-    this.patientsRef.push({
+    this.patientsRef?.push({
       confirmedPatients
     });
   }
