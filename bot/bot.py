@@ -157,14 +157,12 @@ class TelegramBot:
         if option == "1":
             update_id = self.make_appointment_flux(update_id, chat_id, user_infos)
         elif option == "2":
-            update_id = self.cancel_appointment_flux(update_id, chat_id, user_infos)
-        elif option == "3":
             update_id = self.check_appointment_flux(update_id, chat_id, user_infos)
-        elif option == "4":
+        elif option == "3":
             self.responder(speeches.users_speech['acs_notified'], chat_id)
             # TODO notify ACS someway
             # AcsFunctions.notify_acs_contact(user_infos)
-        elif option == "5":
+        elif option == "4":
             self.responder(speeches.users_speech['end'], chat_id)
         else:
             self.responder(speeches.users_speech['invalid'], chat_id)
@@ -222,68 +220,6 @@ class TelegramBot:
         
         return update_id
 
-    def cancel_appointment_flux(self, update_id: int, chat_id: str, user_infos: dict):
-        """
-        """
-        self.responder(speeches.cancel_speech['appointment'], chat_id)
-
-        appointments_string, appointments_dict = self.get_all_appointments(
-            user_infos["cadastro_sus"]
-        )
-
-        self.responder(appointments_string, chat_id)
-
-        found = False
-        while(not found):
-            result, update_id = self.get_next_message_result(update_id, chat_id)
-            if len(result) == 0:
-                return update_id
-            next_message = result[0]
-            appointment_number = next_message["message"]["text"]
-            if appointment_number.isnumeric():
-                appointment_number = int(appointment_number)
-                if appointment_number in appointments_dict:
-                    (appointment, is_appointment_confirmed) = appointments_dict[appointment_number]
-                    found = True
-                else:
-                    self.responder(speeches.error_speech['invalid_number'], chat_id)
-            else:
-                self.responder(speeches.error_speech['only_numbers'], chat_id)
-
-        user_infos["chosen_specialty"] = appointment["specialty"]
-        user_infos["chosen_date"] = appointment["date_hour"]
-        user_infos["chat_id"] = chat_id
-
-        self.responder(speeches.cancel_speech['user_confirmation'].format(
-            user_infos["chosen_specialty"], ubs_name, user_infos["chosen_date"],
-        ), chat_id)
-        result, update_id = self.get_next_message_result(update_id, chat_id)
-        if len(result) == 0:
-            return update_id
-        next_message = result[0]
-        confirmation = next_message["message"]["text"].strip().lower()
-        repeat = True
-        while (repeat):
-            if confirmation == "1" or confirmation == "sim":
-                confirmation = True
-                repeat = False
-            elif confirmation == "2" or confirmation == "nao":
-                confirmation = False
-                repeat = False
-            else:
-                self.responder(speeches.error_speech['invalid_number'], chat_id)
-        
-        if confirmation:
-            if is_appointment_confirmed:
-                self.db.register_cancel_appointment_order(user_infos)
-            else:
-                # TODO check if this feature is really necessary.
-                self.db.cancel_unconfirmed_appointment(user_infos)
-            
-            self.responder(speeches.cancel_speech["acs_notified"], chat_id)
-        
-        return update_id
-
     def check_appointment_flux(self, update_id: int, chat_id: str, user_infos: dict):
         """
         """
@@ -311,7 +247,7 @@ class TelegramBot:
         self.responder(pending_output, chat_id)
 
         return update_id
-        
+
     def get_next_message_result(self, update_id: int, chat_id: str):
         """
         get the next message the of a given chat.

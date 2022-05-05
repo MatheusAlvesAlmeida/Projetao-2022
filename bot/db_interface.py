@@ -99,15 +99,3 @@ class DbFunctions:
         register the appointment in the db.
         """
         self.db.child("pendentes").push(appointment_infos)
-
-    def register_cancel_appointment_order(self, appointment_infos: dict):
-        """
-        Register an appointment cancel order
-        """
-        self.db.child("cancelar").push(appointment_infos)
-
-    def cancel_unconfirmed_appointment(user_appointment_infos: dict):
-        """
-        If an appointment is still unconfirmed, delete it directly from the DB.
-        """
-        # TODO implement
