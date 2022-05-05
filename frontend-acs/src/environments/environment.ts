@@ -3,7 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  firebase: {
+  firebaseConfig: {
     projectId: 'projetao-ubs',
     appId: '1:263329824563:web:f0e31e5fb7866ec1124846',
     storageBucket: 'projetao-ubs.appspot.com',
