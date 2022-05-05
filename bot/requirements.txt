@@ -26,3 +26,4 @@ tzdata==2022.1
 tzlocal==4.2
 urllib3==1.26.9
 Werkzeug==2.1.1
+pyrebase==3.0.27
