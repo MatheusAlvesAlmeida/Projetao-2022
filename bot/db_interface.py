@@ -1,5 +1,11 @@
 from datetime import datetime
+from re import U
 from config import firebase
+
+USER_COLLECTION = "pacientes"
+PENDING_COLLECTION = "pendentes"
+CONFIRMED_COLLECTION = "confirmados"
+CONTACT_ORDER_COLLECTION = "pedidos_contato"
 
 class DbFunctions:
     def __init__(self):
@@ -11,7 +17,7 @@ class DbFunctions:
         If the user does not exist, returns an empty dict.
         """
         response = (
-            self.db.child("pacientes")
+            self.db.child(USER_COLLECTION)
             .order_by_child("cadastro_sus")
             .equal_to(cadastro_sus)
             .limit_to_first(1)
@@ -26,7 +32,7 @@ class DbFunctions:
         """
         Returns a list of all the users.
         """
-        response = self.db.child("pacientes").get()
+        response = self.db.child(USER_COLLECTION).get()
         users_list = []
 
         if (response.val() is not None):
@@ -41,7 +47,7 @@ class DbFunctions:
         Checks if there is already someone with this cadastro_sus registered.
         """
         if len(self.get_user(user_infos["cadastro_sus"])) == 0:
-            self.db.child("pacientes").push(user_infos)
+            self.db.child(USER_COLLECTION).push(user_infos)
             return True
         return False
 
@@ -69,7 +75,7 @@ class DbFunctions:
         pending_appointments_list = []
 
         response = (
-            self.db.child("confirmados")
+            self.db.child(CONFIRMED_COLLECTION)
             .order_by_child("cadastro_sus")
             .equal_to(cadastro_sus)
             .limit_to_first(10)
@@ -81,7 +87,7 @@ class DbFunctions:
                 confirmed_appointments_list.append(appointment.val())
 
         response = (
-            self.db.child("pendentes")
+            self.db.child(PENDING_COLLECTION)
             .order_by_child("cadastro_sus")
             .equal_to(cadastro_sus)
             .limit_to_first(10)
@@ -98,4 +104,12 @@ class DbFunctions:
         """
         register the appointment in the db.
         """
-        self.db.child("pendentes").push(appointment_infos)
+        appointment_infos["date_time"] = str(datetime.now())
+        self.db.child(PENDING_COLLECTION).push(appointment_infos)
+
+    def register_contact_order(self, contact_order_infos: dict):
+        """
+        Register the intent of a user to contact an ACS about something.
+        """
+        contact_order_infos["date_time"] = str(datetime.now())
+        self.db.child(CONTACT_ORDER_COLLECTION).push(contact_order_infos)
