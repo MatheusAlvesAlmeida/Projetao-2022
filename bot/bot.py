@@ -159,9 +159,7 @@ class TelegramBot:
         elif option == "2":
             update_id = self.check_appointment_flux(update_id, chat_id, user_infos)
         elif option == "3":
-            self.responder(speeches.users_speech['acs_notified'], chat_id)
-            # TODO notify ACS someway
-            # AcsFunctions.notify_acs_contact(user_infos)
+            update_id = self.contact_order_flux(update_id, chat_id, user_infos)
         elif option == "4":
             self.responder(speeches.users_speech['end'], chat_id)
         else:
@@ -169,6 +167,54 @@ class TelegramBot:
         
         return update_id
     
+    def contact_order_flux(self, update_id: int, chat_id: str, user_infos: dict):
+        """
+        """
+        contact_type = ""
+        while(len(contact_type) == 0):
+            self.responder(speeches.contact_order_speech['contact_type'], chat_id)
+            result, update_id = self.get_next_message_result(update_id, chat_id)
+            if len(result) == 0:
+                return update_id
+            next_message = result[0]
+            option = next_message["message"]["text"]
+
+            if option == "1":
+                contact_type = "Cancelar ou reagendar."
+            elif option == "2":
+                contact_type = "Dúvidas sobre o funcionamento da UBS."
+            elif option == "3":
+                contact_type = "Especialidade não listada."
+            elif option == "4":
+                contact_type = "Motivos pessoais."
+            elif option == "5":
+                contact_type = "Outros."
+            elif option == "6":
+                self.responder(speeches.users_speech['end'], chat_id)
+                return update_id
+            else:
+                self.responder(speeches.users_speech['invalid'], chat_id)
+        
+        self.responder(speeches.contact_order_speech['contact_description'], chat_id)
+        result, update_id = self.get_next_message_result(update_id, chat_id)
+        if len(result) == 0:
+            return update_id
+        next_message = result[0]
+        description = next_message["message"]["text"]
+
+        contact_order_infos = {
+            "cadastro_sus": user_infos["cadastro_sus"],
+            "name": user_infos["name"],
+            "phone_number": user_infos["phone_number"],
+            "contact_type": contact_type,
+            "contact_description": description
+        }
+
+        self.db.register_contact_order(contact_order_infos)
+        self.responder(speeches.contact_order_speech['acs_notified'], chat_id)
+
+        return update_id
+
     def make_appointment_flux(self, update_id: int, chat_id: str, user_infos: dict):
         """
         """
