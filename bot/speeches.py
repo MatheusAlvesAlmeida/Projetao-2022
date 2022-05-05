@@ -1,13 +1,12 @@
 from sympy import re
 
-
 register_speech = dict()
 users_speech = dict()
 appointment_speech = dict()
 denial_speech = dict()
 check_appointment_speech = dict()
 reschedule_speech = dict()
-cancel_speech = dict()
+contact_order_speech = dict()
 error_speech = dict()
 
 # Greeting user
@@ -34,7 +33,7 @@ register_speech['success'] = "Pronto, seu cadastro foi realizado para os serviç
 register_speech['failure'] = "Infelizmente não foi possível realizar o seu cadastro nesse momento. Tente novamente mais tarde."
 
 #Registered users
-users_speech['hello'] = "Olá {}! Em que posso ajudar?\n1) Solicitar agendamento.\n2) Solicitar cancelamento.\n3) Consultar agendamentos. \n4) Conversar com o meu ACS. \n5) Nada."
+users_speech['hello'] = "Olá {}! Em que posso ajudar?\n1) Solicitar agendamento.\n2) Consultar agendamentos. \n3) Conversar com o meu ACS. \n4) Nada."
 users_speech['acs_notified'] = "O ACS responsável foi notificado e entrará em contato com você em breve!"
 users_speech['end'] = "Então até a próxima!"
 users_speech['invalid'] = "Opção inválida."
@@ -60,11 +59,10 @@ denial_speech['acs_notified'] = "O ACS responsável foi notificado e entrará em
 check_appointment_speech['confirmed'] = "Esses são os seus agendamentos confirmados:"
 check_appointment_speech['pending']= "Esses são os seus agendamentos ainda pendentes:"
 
-#Cancel appointment
-#<especialidade_escolhida>, <nome_UBS>, <data_hora_escolhida>
-cancel_speech['user_confirmation'] = "Você confirma que deseja cancelar uma consulta para {}, na UBS {}, na data {}? \n 1) Sim 2) Não "
-cancel_speech['appointment'] = "Qual agendamento você gostaria de cancelar?"
-cancel_speech['acs_notified']  = "Seu pedido de cancelamento de consulta foi encaminhado para ACS responsável."
+#Contact Order
+contact_order_speech['contact_type'] = "Qual dessas opções melhor classifica o motivo do seu contato?\n1) Cancelar ou reagendar consulta.\n2) Dúvida acerca dos horários e funcionamento da UBS.\n3) A especialidade que quero marcar não está listada na seção de solicitação de agendamentos.\n4) Motivos pessoais.\n5) Outros.\n6) Não preciso falar com a ACS."
+contact_order_speech['contact_description'] = "Em poucas palavras e em apenas uma mensagem, descreva o motivo do seu pedido de contato para que possamos agilizar o processo!"
+contact_order_speech['acs_notified'] = "O ACS responsável será notificado e entrará em contato com você em breve!"
 
 error_speech['invalid_number'] = "Inválido. Pode repetir? Dessa vez, escolha apenas um número das opções listadas anteriormente."
 error_speech['only_numbers'] = "Pode repetir? Dessa vez, apenas o número, por favor!"
