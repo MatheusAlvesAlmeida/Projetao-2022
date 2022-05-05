@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { SuggestionDates } from '../../types/suggestion-dates';
+import { Pending } from '../../types/pending';
 
-
-const ELEMENT_DATA: SuggestionDates[] = [
+// TODO: refact with Pending atrributes
+const ELEMENT_DATA: Pending[] = [
   {
     id: 1,
     name: 'Gabriel',
