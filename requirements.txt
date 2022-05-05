@@ -15,7 +15,7 @@ python-dotenv==0.20.0
 python-telegram-bot==13.11
 pytz==2022.1
 pytz-deprecation-shim==0.1.0.post0
-requests
+requests==2.27.1
 six==1.16.0
 sympy==1.10.1
 tornado==6.1
