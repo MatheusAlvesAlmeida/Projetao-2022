@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CalendarData } from '../../types/calendar-data';
+import { CalendarService } from '../../api/calendar.service';
 
 const ELEMENT_DATA: CalendarData[] = [
   {
@@ -32,13 +33,13 @@ const ELEMENT_DATA: CalendarData[] = [
 })
 export class WeekCalendarComponent implements OnInit {
 
-  dataSource = [...ELEMENT_DATA];
+  dataSource!: CalendarData;
 
-  constructor() { }
-
-  ngOnInit(): void {
+  constructor(private calendarService: CalendarService) {
+    
   }
 
-
-
+  ngOnInit(): void {
+    this.dataSource = this.calendarService.getAll();
+  }
 }

@@ -1,11 +1,11 @@
 export interface Pending {
+    id: number;
     date: Date;
     address_number: string;
-    cadastro_sus: string;
+    sus: string;
     cep: string;
     chat_id: number;
-    chosen_speciality: string;
-    gender: string;
+    service: string;
     name: string;
     phone_number: string;
 }
