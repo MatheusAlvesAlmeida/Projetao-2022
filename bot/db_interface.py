@@ -1,6 +1,7 @@
 from datetime import datetime
-from re import U
-from config import firebase
+from config import database_url
+import requests
+import json
 
 USER_COLLECTION = "pacientes"
 PENDING_COLLECTION = "pendentes"
@@ -9,45 +10,34 @@ CONTACT_ORDER_COLLECTION = "pedidos_contato"
 
 class DbFunctions:
     def __init__(self):
-        self.db = firebase.database()
+        self.db = DbConnection()
 
     def get_user(self, cadastro_sus: str) -> dict:
         """
         Returns all the information of the user whose cadastros_sus is the one passed as dict.
         If the user does not exist, returns an empty dict.
         """
-        response = (
-            self.db.child(USER_COLLECTION)
-            .order_by_child("cadastro_sus")
-            .equal_to(cadastro_sus)
-            .limit_to_first(1)
-            .get()
+        retrieved_data = self.db.getFilteredData(
+            USER_COLLECTION, "cadastro_sus", cadastro_sus
         )
-        if (response.val() is None):
-            return {}
-        for user in response.each():
-            return user.val()
+
+        if retrieved_data is not None:
+            for key in retrieved_data:
+                return retrieved_data[key]
     
-    def get_all_users(self) -> list:
-        """
-        Returns a list of all the users.
-        """
-        response = self.db.child(USER_COLLECTION).get()
-        users_list = []
-
-        if (response.val() is not None):
-            for user in response.each():
-                users_list.append(user.val())
-
-        return users_list
+        return {}
 
     def register_user(self, user_infos: dict):
         """
         Register new user.
         Checks if there is already someone with this cadastro_sus registered.
         """
-        if len(self.get_user(user_infos["cadastro_sus"])) == 0:
-            self.db.child(USER_COLLECTION).push(user_infos)
+        retrieved_data = self.db.getFilteredData(
+            USER_COLLECTION, "cadastro_sus", user_infos["cadastro_sus"]
+        )
+        
+        if retrieved_data is None:
+            self.db.postData(USER_COLLECTION, user_infos)
             return True
         return False
 
@@ -74,29 +64,23 @@ class DbFunctions:
         confirmed_appointments_list = []
         pending_appointments_list = []
 
-        response = (
-            self.db.child(CONFIRMED_COLLECTION)
-            .order_by_child("cadastro_sus")
-            .equal_to(cadastro_sus)
-            .limit_to_first(10)
-            .get()
+        retrieved_data = self.db.getFilteredData(
+            CONFIRMED_COLLECTION, "cadastro_sus", cadastro_sus
         )
+        if retrieved_data is not None:
+            for key in retrieved_data:
+                confirmed_appointments_list.append(
+                    retrieved_data[key]
+                )
 
-        if (response.val() is not None):
-            for appointment in response.each():
-                confirmed_appointments_list.append(appointment.val())
-
-        response = (
-            self.db.child(PENDING_COLLECTION)
-            .order_by_child("cadastro_sus")
-            .equal_to(cadastro_sus)
-            .limit_to_first(10)
-            .get()
+        retrieved_data = self.db.getFilteredData(
+            PENDING_COLLECTION, "cadastro_sus", cadastro_sus
         )
-
-        if (response.val() is not None):
-            for appointment in response.each():
-                pending_appointments_list.append(appointment.val())
+        if retrieved_data is not None:
+            for key in retrieved_data:
+                pending_appointments_list.append(
+                    retrieved_data[key]
+                )
 
         return confirmed_appointments_list, pending_appointments_list
 
@@ -105,11 +89,37 @@ class DbFunctions:
         register the appointment in the db.
         """
         appointment_infos["date_time"] = str(datetime.now())
-        self.db.child(PENDING_COLLECTION).push(appointment_infos)
+        self.db.postData(PENDING_COLLECTION, appointment_infos)
 
     def register_contact_order(self, contact_order_infos: dict):
         """
         Register the intent of a user to contact an ACS about something.
         """
         contact_order_infos["date_time"] = str(datetime.now())
-        self.db.child(CONTACT_ORDER_COLLECTION).push(contact_order_infos)
+        self.db.postData(CONTACT_ORDER_COLLECTION, contact_order_infos)
+
+class DbConnection:
+    def __init__(self):
+        self.db_url = database_url
+
+    def getFilteredData(self, collection: str, filter_key: str, filter_pattern: str):
+        request_link = self.db_url + f"/{collection}.json?orderBy=\"{filter_key}\"&equalTo=\"{filter_pattern}\""
+
+        response = requests.get(request_link)
+        data = json.loads(response.content)
+        return data
+
+    def getData(self, collection: str):
+        request_link = self.db_url + f"/{collection}.json"
+
+        response = requests.get(request_link)
+        data = json.loads(response.content)
+        return data
+
+    def postData(self, collection: str, data: dict):
+        requests.post(self.db_url + f"/{collection}.json", json=data)
+
+# conn = DbConnection()
+
+# response = conn.getFilteredData(USER_COLLECTION, "cadastro_sus", "234")
+# print(response)

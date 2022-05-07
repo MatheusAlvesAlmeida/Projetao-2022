@@ -1,5 +1,4 @@
 import os
-import pyrebase
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -33,18 +32,3 @@ auth_domain = os.getenv("AUTH_DOMAIN")
 database_url = os.getenv("DATABASE_URL")
 
 storage_bucket = os.getenv("STORAGE_BUCKET")
-
-pyrebase_config = {
-  "apiKey": pyrebase_api,
-  "authDomain": auth_domain,
-  "databaseURL": database_url,
-  "storageBucket": storage_bucket
-}
-
-firebase = pyrebase.initialize_app(pyrebase_config)
-
-# Temporarily replace quote function
-def noquote(s):
-    return s
-
-pyrebase.pyrebase.quote = noquote
