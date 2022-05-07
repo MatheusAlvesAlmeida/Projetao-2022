@@ -17,8 +17,12 @@ import { AcsDataComponent } from './components/acs-data/acs-data.component';
 import { HomePageComponent } from './pages/home-page.component';
 import { HomeOptionsComponent } from './components/home-options/home-options.component';
 import { WeekCalendarComponent } from './components/week-calendar/week-calendar.component';
+import { CalendarService } from './api/calendar.service';
 
 @NgModule({
+  providers: [
+    CalendarService,
+  ],
   declarations: [
     AcsDataComponent,
     HomePageComponent,

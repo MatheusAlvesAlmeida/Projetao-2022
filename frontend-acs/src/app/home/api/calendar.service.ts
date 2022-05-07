@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { CalendarData } from '../types/calendar-data';
 import { AngularFireDatabase } from '@angular/fire/compat/database';
+import { Observable } from 'rxjs';
 
 
 @Injectable()
 export class CalendarService {
   angularfire: AngularFireDatabase;
-  items: CalendarData[] = [];
 
   constructor(af: AngularFireDatabase) {
     this.angularfire = af;
@@ -14,7 +14,7 @@ export class CalendarService {
 
   getAll() {
     // Buscando todos os itens no no "/task"
-    const result = this.angularfire.list('/weekCalendar');
+    const result = this.angularfire.list('/weekCalendar').valueChanges() as any;
     console.log(result);
     return result;
   }

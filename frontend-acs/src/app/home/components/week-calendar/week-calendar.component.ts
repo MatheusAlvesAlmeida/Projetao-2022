@@ -2,29 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CalendarData } from '../../types/calendar-data';
 import { CalendarService } from '../../api/calendar.service';
 
-const ELEMENT_DATA: CalendarData[] = [
-  {
-    username: 'Matheus',
-    service: 'Médico clínico geral',
-    sus: '123465',
-    queuePosition: 1,
-    date: new Date("2000-12-17T03:24:00"),
-  },
-  {
-    username: 'Matheus',
-    service: 'Dentista',
-    sus: '123465',
-    queuePosition: 1,
-    date: '24/04/2022',
-  },
-  {
-    username: 'Pietro',
-    service: 'Médico clínico geral',
-    sus: '123465',
-    queuePosition: 1,
-    date: '24/04/2022',
-  }
-];
+const ELEMENT_DATA: CalendarData[] = [];
+
 
 @Component({
   selector: 'app-week-calendar',
@@ -33,13 +12,17 @@ const ELEMENT_DATA: CalendarData[] = [
 })
 export class WeekCalendarComponent implements OnInit {
 
-  dataSource!: CalendarData;
+  dataSource = [...ELEMENT_DATA];
 
   constructor(private calendarService: CalendarService) {
     
   }
 
   ngOnInit(): void {
-    this.dataSource = this.calendarService.getAll();
+    const result = this.calendarService.getAll();
+    this.dataSource = [];
+    result.subscribe((data: any[]) => {
+      data.forEach((element) => this.dataSource.push(element));
+    });
   }
 }
