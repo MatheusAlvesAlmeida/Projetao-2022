@@ -21,7 +21,7 @@ class DbFunctions:
             USER_COLLECTION, "cadastro_sus", cadastro_sus
         )
 
-        if retrieved_data is not None:
+        if len(retrieved_data) > 0:
             for key in retrieved_data:
                 return retrieved_data[key]
     
@@ -35,8 +35,9 @@ class DbFunctions:
         retrieved_data = self.db.getFilteredData(
             USER_COLLECTION, "cadastro_sus", user_infos["cadastro_sus"]
         )
-        
-        if retrieved_data is None:
+
+        if len(retrieved_data) == 0:
+            user_infos["register_date"] = str(datetime.now())
             self.db.postData(USER_COLLECTION, user_infos)
             return True
         return False
@@ -67,7 +68,7 @@ class DbFunctions:
         retrieved_data = self.db.getFilteredData(
             CONFIRMED_COLLECTION, "cadastro_sus", cadastro_sus
         )
-        if retrieved_data is not None:
+        if len(retrieved_data) > 0:
             for key in retrieved_data:
                 confirmed_appointments_list.append(
                     retrieved_data[key]
@@ -76,7 +77,7 @@ class DbFunctions:
         retrieved_data = self.db.getFilteredData(
             PENDING_COLLECTION, "cadastro_sus", cadastro_sus
         )
-        if retrieved_data is not None:
+        if len(retrieved_data) > 0:
             for key in retrieved_data:
                 pending_appointments_list.append(
                     retrieved_data[key]
@@ -118,8 +119,3 @@ class DbConnection:
 
     def postData(self, collection: str, data: dict):
         requests.post(self.db_url + f"/{collection}.json", json=data)
-
-# conn = DbConnection()
-
-# response = conn.getFilteredData(USER_COLLECTION, "cadastro_sus", "234")
-# print(response)
