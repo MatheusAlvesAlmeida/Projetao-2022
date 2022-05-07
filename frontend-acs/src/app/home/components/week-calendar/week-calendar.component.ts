@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CalendarData } from '../../types/calendar-data';
-import { CalendarService } from '../../api/calendar.service';
+import { apiFacade } from '../../home.facade';
 
 const ELEMENT_DATA: CalendarData[] = [];
-
 
 @Component({
   selector: 'app-week-calendar',
@@ -14,15 +13,13 @@ export class WeekCalendarComponent implements OnInit {
 
   dataSource = [...ELEMENT_DATA];
 
-  constructor(private calendarService: CalendarService) {
-    
-  }
-
-  ngOnInit(): void {
-    const result = this.calendarService.getAll();
+  constructor(private readonly calendarFacade: apiFacade) {
+    const result = this.calendarFacade.getWeekCalendarPlanning();
     this.dataSource = [];
     result.subscribe((data: any[]) => {
       data.forEach((element) => this.dataSource.push(element));
     });
   }
+
+  ngOnInit(): void { }
 }

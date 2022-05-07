@@ -13,9 +13,7 @@ export class CalendarService {
   }
 
   getAll() {
-    // Buscando todos os itens no no "/task"
     const result = this.angularfire.list('/weekCalendar').valueChanges() as any;
-    console.log(result);
     return result;
   }
 }

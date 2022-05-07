@@ -18,10 +18,12 @@ import { HomePageComponent } from './pages/home-page.component';
 import { HomeOptionsComponent } from './components/home-options/home-options.component';
 import { WeekCalendarComponent } from './components/week-calendar/week-calendar.component';
 import { CalendarService } from './api/calendar.service';
+import { apiFacade } from './home.facade';
 
 @NgModule({
   providers: [
     CalendarService,
+    apiFacade,
   ],
   declarations: [
     AcsDataComponent,
