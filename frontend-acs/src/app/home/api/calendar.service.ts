@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CalendarData } from '../types/calendar-data';
 import { AngularFireDatabase } from '@angular/fire/compat/database';
-import { Observable } from 'rxjs';
 
 
 @Injectable()
@@ -13,7 +11,6 @@ export class CalendarService {
   }
 
   getAll() {
-    const result = this.angularfire.list('/weekCalendar').valueChanges() as any;
-    return result;
+    return this.angularfire.list('/weekCalendar').valueChanges() as any;
   }
 }
