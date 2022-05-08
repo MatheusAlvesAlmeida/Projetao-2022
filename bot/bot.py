@@ -339,7 +339,7 @@ class TelegramBot:
         return json.loads(requests.get(link_requisicao).content)["result"]
 
     def responder(self, resposta, chat_id):
-        link_requisicao = f'{self.url_base}sendMessage?chat_id={chat_id}&text={resposta}'
+        link_requisicao = f'{self.url_base}sendMessage?chat_id={chat_id}&text={resposta}&parse_mode=markdown'
         requests.get(link_requisicao)
 
     def getSpecialtyOptions(self):
