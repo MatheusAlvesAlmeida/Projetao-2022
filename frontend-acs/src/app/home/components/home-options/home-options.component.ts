@@ -1,31 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { apiFacade } from '../../home.facade';
 import { Pending } from '../../types/pending';
-
-// TODO: refact with Pending atrributes
-const ELEMENT_DATA: Pending[] = [
-  {
-    id: 1,
-    date: new Date('04/05/2022'),
-    address_number: 'Endereço',
-    sus: '5165165165',
-    cep: '56800000',
-    chat_id: 1,
-    service: 'Médico geral',
-    name: 'Xuribas, o cara',
-    phone_number: '8799966666',
-  },
-  {
-    id: 2,
-    date: new Date('05/05/2022'),
-    address_number: 'Endereço',
-    sus: '5165165165',
-    cep: '56800000',
-    chat_id: 1,
-    service: 'Médico geral',
-    name: 'Xuribas, o quase cara',
-    phone_number: '22222222',
-  },
-];
 
 @Component({
   selector: 'app-home-options',
@@ -33,13 +8,17 @@ const ELEMENT_DATA: Pending[] = [
   styleUrls: ['./home-options.component.css'],
 })
 export class HomeOptionsComponent implements OnInit {
-  constructor() { }
+  dataSource: Pending[] = [];
 
-  ngOnInit(): void { }
+  constructor(private readonly suggestionsFacade: apiFacade) {}
 
-  dataSource = [...ELEMENT_DATA];
-
-  confirmAllSuggestions() { }
-
-  cancelAllSuggestions() { }
+  ngOnInit(): void {
+    const result = this.suggestionsFacade.getSuggestions();
+    result.subscribe((data: Pending[]) => {
+      console.log(data);
+      this.dataSource = data;
+      console.log(this.dataSource);
+    });
+    console.log(this.dataSource);
+  }
 }

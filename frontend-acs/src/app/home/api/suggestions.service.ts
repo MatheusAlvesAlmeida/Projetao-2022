@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase } from '@angular/fire/compat/database';
 
-
 @Injectable()
 export class SuggestionsService {
   angularfire: AngularFireDatabase;
@@ -14,19 +13,9 @@ export class SuggestionsService {
     return this.angularfire.list('/pendentes').valueChanges() as any;
   }
 
-  confirmAll(){
-    
+  confirm(chat_id: number) {
+    //this.angularfire.createPushId('/weekCalendar/' + chat_id)
   }
 
-  rejectAll(){
-
-  }
-
-  confirm(){
-
-  }
-
-  reject(){
-
-  }
+  reject() {}
 }
