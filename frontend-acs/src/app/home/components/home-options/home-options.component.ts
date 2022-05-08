@@ -22,4 +22,8 @@ export class HomeOptionsComponent implements OnInit {
   confirm(patient: Pending) {
     this.suggestionsFacade.confirm(patient);
   }
+
+  reject(patient: Pending) {
+    this.suggestionsFacade.reject(patient);
+  }
 }

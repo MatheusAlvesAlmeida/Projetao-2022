@@ -32,6 +32,10 @@ export class apiFacade {
       queuePosition: 0,
       date: patient.date_time,
     };
-    this.suggestionsAPI.confirm(newPatient);
+    this.suggestionsAPI.confirm(newPatient, patient.chat_id);
+  }
+
+  public reject(patient: Pending) {
+    this.suggestionsAPI.reject(patient);
   }
 }

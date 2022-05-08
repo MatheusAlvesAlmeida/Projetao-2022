@@ -15,9 +15,12 @@ export class SuggestionsService {
     return this.angularfire.list('/pendentes').valueChanges() as any;
   }
 
-  confirm(patient: CalendarData) {
+  confirm(patient: CalendarData, chat_id: number) {
     this.angularfire.list('/weekCalendar').push(patient);
+    this.angularfire.list('/pendentes/' + chat_id).remove();
   }
 
-  reject() {}
+  reject(patient: Pending) {
+    this.angularfire.list('/pendentes/' + patient.chat_id).remove();
+  }
 }
