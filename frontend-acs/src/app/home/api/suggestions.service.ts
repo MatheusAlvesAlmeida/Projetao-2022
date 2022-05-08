@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase } from '@angular/fire/compat/database';
+import { CalendarData } from '../types/calendar-data';
+import { Pending } from '../types/pending';
 
 @Injectable()
 export class SuggestionsService {
@@ -13,8 +15,8 @@ export class SuggestionsService {
     return this.angularfire.list('/pendentes').valueChanges() as any;
   }
 
-  confirm(chat_id: number) {
-    //this.angularfire.createPushId('/weekCalendar/' + chat_id)
+  confirm(patient: CalendarData) {
+    this.angularfire.list('/weekCalendar').push(patient);
   }
 
   reject() {}

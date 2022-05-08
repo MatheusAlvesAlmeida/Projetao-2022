@@ -15,10 +15,11 @@ export class HomeOptionsComponent implements OnInit {
   ngOnInit(): void {
     const result = this.suggestionsFacade.getSuggestions();
     result.subscribe((data: Pending[]) => {
-      console.log(data);
       this.dataSource = data;
-      console.log(this.dataSource);
     });
-    console.log(this.dataSource);
+  }
+
+  confirm(patient: Pending) {
+    this.suggestionsFacade.confirm(patient);
   }
 }

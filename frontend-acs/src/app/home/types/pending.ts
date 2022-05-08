@@ -1,5 +1,4 @@
 export interface Pending {
-  id: number;
   date_time: Date;
   address_number: string;
   cadastro_sus: string;

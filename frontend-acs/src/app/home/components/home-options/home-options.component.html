@@ -1,19 +1,13 @@
-<button mat-raised-button color="primary" >
-  Confirmar todos
-</button>
-<button mat-raised-button color="warn" >
-  Cancelar todos
-</button>
 <div class="container" *ngFor="let patient of dataSource">
   <mat-card class="example-card">
     <mat-card-content
-      ><h3>Nome: {{ patient.name }}</h3>
+      ><h3>Nome: {{ patient.name }}</h3> 
       <h3>SUS: {{ patient.cadastro_sus }}</h3>
       <p><strong>Atendimento:</strong> {{ patient.chosen_specialty }}</p>
       <p><strong>Data sugerida:</strong> {{ patient.date_time }}</p>
     </mat-card-content>
     <mat-card-actions>
-      <button color="primary" mat-raised-button>Confirmar</button>
+      <button color="primary" mat-raised-button (click)="confirm(patient)" >Confirmar</button>
       <button color="warn" mat-raised-button>Editar</button>
     </mat-card-actions>
   </mat-card>
