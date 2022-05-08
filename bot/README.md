@@ -34,6 +34,10 @@ python main.py
 ```
 ## Interacting with bot
 
-The bot can found in this telegram link:
+The live/production bot can found in this telegram link:
 
-`t.me/UbinhoBot`
+`https://t.me/UbinhoBot`
+
+The developtment bot can found in this telegram link:
+
+`https://t.me/devubsbot`
