@@ -17,7 +17,7 @@ class TelegramBot:
         print("message timeout: ", message_timeout)
 
         self.url_base = f'https://api.telegram.org/bot{self.token}/'
-        self.specialty_repo = ["Odontologia", "Pediatria", "Oftalmologia", "Urologia", "Ginecologia"]
+        self.specialty_repo = ["Odontologia", "Médico geral", "Enfermaria"]
         self.sleep_time = 3
 
         self.db = DbFunctions()
