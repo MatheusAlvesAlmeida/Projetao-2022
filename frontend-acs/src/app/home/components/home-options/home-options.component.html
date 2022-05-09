@@ -1,14 +1,18 @@
 <div class="container" *ngFor="let patient of dataSource">
   <mat-card class="example-card">
     <mat-card-content
-      ><h3>Nome: {{ patient.name }}</h3> 
+      ><h3>Nome: {{ patient.name }}</h3>
       <h3>SUS: {{ patient.cadastro_sus }}</h3>
       <p><strong>Atendimento:</strong> {{ patient.chosen_specialty }}</p>
-      <p><strong>Data sugerida:</strong> {{ patient.date_time }}</p>
+      <p><strong>Ordem de chegada:</strong> {{ patient.date_time }}</p>
     </mat-card-content>
     <mat-card-actions>
-      <button color="primary" mat-raised-button (click)="confirm(patient)" >Confirmar</button>
-      <button color="warn" mat-raised-button (click)="reject(patient)">Rejeitar</button>
+      <button color="primary" mat-raised-button (click)="confirm(patient)">
+        Confirmar
+      </button>
+      <button color="warn" mat-raised-button (click)="reject(patient)">
+        Rejeitar
+      </button>
     </mat-card-actions>
   </mat-card>
 </div>

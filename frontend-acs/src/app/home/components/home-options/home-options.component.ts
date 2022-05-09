@@ -16,6 +16,20 @@ export class HomeOptionsComponent implements OnInit {
     const result = this.suggestionsFacade.getSuggestions();
     result.subscribe((data: Pending[]) => {
       this.dataSource = data;
+      let auxDate;
+      this.dataSource?.forEach((patient) => {
+        auxDate = new Date(patient.date_time);
+        patient.date_time =
+          String(auxDate.getDay() + 1).padStart(2, '0') +
+          '/' +
+          String(auxDate.getMonth()).padStart(2, '0') +
+          '/' +
+          auxDate.getFullYear() +
+          ' - ' +
+          auxDate.getHours() +
+          ':' +
+          auxDate.getMinutes();
+      });
     });
   }
 
