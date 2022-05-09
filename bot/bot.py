@@ -1,4 +1,3 @@
-from datetime import datetime, timedelta
 import requests
 import json
 import time
@@ -18,7 +17,7 @@ class TelegramBot:
         print("message timeout: ", message_timeout)
 
         self.url_base = f'https://api.telegram.org/bot{self.token}/'
-        self.specialty_repo = ["Odontologia", "Pediatria", "Oftalmologia", "Urologia", "Ginecologia"]
+        self.specialty_repo = ["Odontologia", "Médico geral", "Enfermaria"]
         self.sleep_time = 3
 
         self.db = DbFunctions()
@@ -340,7 +339,7 @@ class TelegramBot:
         return json.loads(requests.get(link_requisicao).content)["result"]
 
     def responder(self, resposta, chat_id):
-        link_requisicao = f'{self.url_base}sendMessage?chat_id={chat_id}&text={resposta}'
+        link_requisicao = f'{self.url_base}sendMessage?chat_id={chat_id}&text={resposta}&parse_mode=markdown'
         requests.get(link_requisicao)
 
     def getSpecialtyOptions(self):
