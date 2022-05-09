@@ -1,6 +1,6 @@
 export interface acsData {
-    cpf: string;
-    desc: string;
-    image: string;
-    name: number;
+  cpf: string;
+  desc: string;
+  image: string;
+  name: string;
 }

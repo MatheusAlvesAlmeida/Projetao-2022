@@ -10,10 +10,11 @@ import { ChangeDetectorRef } from '@angular/core';
 })
 export class AcsDataComponent implements OnInit {
   dataSource: acsData = {
-    cpf: '',
-    desc: '',
-    image: '',
-    name: 0,
+    cpf: '68795443223',
+    desc: 'Trabalha de segunda à sexta, das 8:00 às 17:00',
+    image:
+      'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fclaudia.abril.com.br%2Fwp-content%2Fuploads%2F2020%2F04%2Fianara-araujo-fernandes-enfermeira-em-dublin-e1585762335607.jpg&f=1&nofb=1',
+    name: 'Maria Aparecida',
   };
 
   constructor(
@@ -22,14 +23,11 @@ export class AcsDataComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const result = this.acsDataFacade.getAcsDataBy('acs1');
-    console.log(result);
-    result.subscribe((data: acsData) => {
-      console.log(data);
-      this.dataSource = data;
-      console.log(this.dataSource);
-    });
-    console.log(this.dataSource);
-    this.changeDetectorRefs.detectChanges();
+    // const result = this.acsDataFacade.getAcsDataBy('acs1');
+    // result.subscribe((data: acsData) => {
+    //   this.dataSource = data;
+    // });
+    // console.log('acs', this.dataSource);
+    // this.changeDetectorRefs.detectChanges();
   }
 }
