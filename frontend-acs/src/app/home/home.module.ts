@@ -17,8 +17,13 @@ import { AcsDataComponent } from './components/acs-data/acs-data.component';
 import { HomePageComponent } from './pages/home-page.component';
 import { HomeOptionsComponent } from './components/home-options/home-options.component';
 import { WeekCalendarComponent } from './components/week-calendar/week-calendar.component';
+import { CalendarService } from './api/calendar.service';
+import { apiFacade } from './home.facade';
+import { acsDataService } from './api/acsData.service';
+import { SuggestionsService } from './api/suggestions.service';
 
 @NgModule({
+  providers: [CalendarService, acsDataService, SuggestionsService, apiFacade],
   declarations: [
     AcsDataComponent,
     HomePageComponent,
@@ -41,6 +46,6 @@ import { WeekCalendarComponent } from './components/week-calendar/week-calendar.
       provide: DateAdapter,
       useFactory: adapterFactory,
     }),
-  ]
+  ],
 })
-export class HomeModule { }
+export class HomeModule {}

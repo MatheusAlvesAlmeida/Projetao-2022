@@ -1,25 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { SuggestionDates } from '../../types/suggestion-dates';
-
-
-const ELEMENT_DATA: SuggestionDates[] = [
-  {
-    id: 1,
-    name: 'Gabriel',
-    service: 'Médico clínico geral',
-    sus: '123456789',
-    queuePosition: 1,
-    appointment: '09:00 - 04/05/2022',
-  },
-  {
-    id: 2,
-    name: 'Pietro',
-    service: 'Dentista',
-    sus: '123456789',
-    queuePosition: 2,
-    appointment: '09:30 - 04/05/2022',
-  },
-];
+import { apiFacade } from '../../home.facade';
+import { Pending } from '../../types/pending';
 
 @Component({
   selector: 'app-home-options',
@@ -27,13 +8,36 @@ const ELEMENT_DATA: SuggestionDates[] = [
   styleUrls: ['./home-options.component.css'],
 })
 export class HomeOptionsComponent implements OnInit {
-  constructor() { }
+  dataSource: Pending[] = [];
 
-  ngOnInit(): void { }
+  constructor(private readonly suggestionsFacade: apiFacade) {}
 
-  dataSource = [...ELEMENT_DATA];
+  ngOnInit(): void {
+    const result = this.suggestionsFacade.getSuggestions();
+    result.subscribe((data: Pending[]) => {
+      this.dataSource = data;
+      let auxDate;
+      this.dataSource?.forEach((patient) => {
+        auxDate = new Date(patient.date_time);
+        patient.date_time =
+          String(auxDate.getDay() + 1).padStart(2, '0') +
+          '/' +
+          String(auxDate.getMonth()).padStart(2, '0') +
+          '/' +
+          auxDate.getFullYear() +
+          ' - ' +
+          auxDate.getHours() +
+          ':' +
+          auxDate.getMinutes();
+      });
+    });
+  }
 
-  confirmAllSuggestions() { }
+  confirm(patient: Pending) {
+    this.suggestionsFacade.confirm(patient);
+  }
 
-  cancelAllSuggestions() { }
+  reject(patient: Pending) {
+    this.suggestionsFacade.reject(patient);
+  }
 }
